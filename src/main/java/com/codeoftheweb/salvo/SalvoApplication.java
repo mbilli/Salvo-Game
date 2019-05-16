@@ -83,30 +83,30 @@ public class SalvoApplication {
 			gameplayer1.addShip(ship1);
 			gameplayer1.addShip(ship2);
 			gameplayer1.addShip(ship3);
-			gameplayer1.addShip(ship4);
-			gameplayer1.addShip(ship5);
-			gameplayer2.addShip(ship6);
-			gameplayer2.addShip(ship7);
-			gameplayer2.addShip(ship8);
-			gameplayer2.addShip(ship9);
-			gameplayer3.addShip(ship10);
-			gameplayer3.addShip(ship11);
-			gameplayer3.addShip(ship12);
-			gameplayer3.addShip(ship13);
-			gameplayer4.addShip(ship14);
-			gameplayer4.addShip(ship15);
-			gameplayer4.addShip(ship16);
-			gameplayer4.addShip(ship17);
-			gameplayer5.addShip(ship18);
-			gameplayer5.addShip(ship19);
-			gameplayer5.addShip(ship20);
-			gameplayer5.addShip(ship21);
-			gameplayer6.addShip(ship22);
-			gameplayer6.addShip(ship23);
-			gameplayer8.addShip(ship24);
-			gameplayer8.addShip(ship25);
-			gameplayer8.addShip(ship26);
-			gameplayer8.addShip(ship27);
+			gameplayer2.addShip(ship4);
+			gameplayer2.addShip(ship5);
+			gameplayer3.addShip(ship6);
+			gameplayer3.addShip(ship7);
+			gameplayer4.addShip(ship8);
+			gameplayer4.addShip(ship9);
+			gameplayer5.addShip(ship10);
+			gameplayer5.addShip(ship11);
+			gameplayer6.addShip(ship12);
+			gameplayer6.addShip(ship13);
+			gameplayer7.addShip(ship14);
+			gameplayer7.addShip(ship15);
+			gameplayer8.addShip(ship16);
+			gameplayer8.addShip(ship17);
+			gameplayer9.addShip(ship18);
+			gameplayer9.addShip(ship19);
+			gameplayer10.addShip(ship20);
+			gameplayer10.addShip(ship21);
+			gameplayer11.addShip(ship22);
+			gameplayer11.addShip(ship23);
+			gameplayer12.addShip(ship24);
+			gameplayer12.addShip(ship25);
+			gameplayer13.addShip(ship26);
+			gameplayer13.addShip(ship27);
 
 			// Save gameplayer
 			gpRepository.save(gameplayer1);
@@ -117,6 +117,12 @@ public class SalvoApplication {
 			gpRepository.save(gameplayer6);
 			gpRepository.save(gameplayer7);
 			gpRepository.save(gameplayer8);
+			gpRepository.save(gameplayer9);
+			gpRepository.save(gameplayer10);
+			gpRepository.save(gameplayer11);
+			gpRepository.save(gameplayer12);
+			gpRepository.save(gameplayer13);
+			gpRepository.save(gameplayer14);
 		};
 	}
 }

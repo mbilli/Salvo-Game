@@ -94,7 +94,7 @@ public class GamePlayer {
     dto.put("gameId", this.game.getId());
     dto.put("created", this.game.getCreationDate());
     dto.put("gamePlayers", this.game.getGamePlayers().stream().map(GamePlayer::makeDTO));
-    dto.put("ships", this.getShips().stream().map(Ship::getShipType));
+    dto.put("ships", this.getShips().stream().map(Ship::makeDTO));
     return dto;
   }
 }

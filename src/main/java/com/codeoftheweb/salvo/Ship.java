@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Entity
 public class Ship {
@@ -64,5 +62,13 @@ public class Ship {
 
   public void setShipLocation(List<String> shipLocation) {
     this.shipLocation = shipLocation;
+  }
+
+  // Ship DTO
+  public Map<String, Object> makeDTO() {
+    Map<String, Object> dto = new LinkedHashMap<String, Object>();
+    dto.put("type", this.getShipType());
+    dto.put("locations", this.getShipLocation());
+    return dto;
   }
 }
