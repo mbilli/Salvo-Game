@@ -28,6 +28,10 @@ public class GamePlayer {
   @OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private Set<Ship> ships = new HashSet<>();
 
+  @OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  private Set<Salvo> salvoes = new HashSet<>();
+
+  // Constructors
   public GamePlayer() {
     this.creationDate = LocalDateTime.now();
   }
@@ -38,8 +42,13 @@ public class GamePlayer {
     this.creationDate = LocalDateTime.now();
   }
 
+  // setters and getters
   public LocalDateTime getCreationDate() {
     return creationDate;
+  }
+
+  public void setCreationDate(LocalDateTime creationDate) {
+    this.creationDate = creationDate;
   }
 
   public long getId() {
@@ -50,9 +59,6 @@ public class GamePlayer {
     this.id = id;
   }
 
-  public void setCreationDate(LocalDateTime creationDate) {
-    this.creationDate = creationDate;
-  }
 
   public Player getPlayer() {
     return player;
@@ -60,6 +66,22 @@ public class GamePlayer {
 
   public void setPlayer(Player player) {
     this.player = player;
+  }
+
+  public Set<Ship> getShips() {
+    return ships;
+  }
+
+  public void setShips(Set<Ship> ships) {
+    this.ships = ships;
+  }
+
+  public void setSalvoes(Set<Salvo> salvoes) {
+    this.salvoes = salvoes;
+  }
+
+  public Set<Salvo> getSalvoes() {
+    return salvoes;
   }
 
   public Game getGame() {
@@ -70,14 +92,15 @@ public class GamePlayer {
     this.game = game;
   }
 
-  // Retorna los Ships
-  public Set<Ship> getShips() {
-    return ships;
-  }
-
+  // methods
   public void addShip(Ship ship) {
     ship.setGamePlayer(this);
     ships.add(ship);
+  }
+
+  public void addSalvo(Salvo salvo) {
+    salvo.setGamePlayer(this);
+    salvoes.add(salvo);
   }
 
   // GamePlayer DTO
@@ -95,6 +118,8 @@ public class GamePlayer {
     dto.put("created", this.game.getCreationDate());
     dto.put("gamePlayers", this.game.getGamePlayers().stream().map(GamePlayer::makeDTO));
     dto.put("ships", this.getShips().stream().map(Ship::makeDTO));
+    dto.put("salvoes:", this.game.getGamePlayers().stream()
+            .flatMap(gamePlayer -> gamePlayer.getSalvoes().stream().map(Salvo::makeDTO)));
     return dto;
   }
 }

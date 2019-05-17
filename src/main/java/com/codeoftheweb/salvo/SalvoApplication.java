@@ -16,7 +16,9 @@ public class SalvoApplication {
 	}
 
 	@Bean
-	public CommandLineRunner initData(PlayerRepository playerRepository, GameRepository gameRepository, GamePlayerRepository gpRepository, ShipRepository shipRepository) {
+	public CommandLineRunner initData(PlayerRepository playerRepository, GameRepository gameRepository,
+																		GamePlayerRepository gpRepository, ShipRepository shipRepository,
+																		SalvoRepository salvoRepository) {
 		return (args) -> {
 			// save a couple of Players
 			Player player1 = playerRepository.save(new Player("Jack", "Bauer", "j.bauer@ctu.gov"));
@@ -107,6 +109,52 @@ public class SalvoApplication {
 			gameplayer12.addShip(ship25);
 			gameplayer13.addShip(ship26);
 			gameplayer13.addShip(ship27);
+
+			// create Salvoes
+			Salvo salvo1 = new Salvo(1, Arrays.asList("B5", "C5", "F1"));
+			Salvo salvo2 = new Salvo(1, Arrays.asList("B4", "B5", "B6"));
+			Salvo salvo3 = new Salvo(2, Arrays.asList("F2", "D5"));
+			Salvo salvo4 = new Salvo(2, Arrays.asList("E1", "H3", "A2"));
+			Salvo salvo5 = new Salvo(1, Arrays.asList("A2", "A4", "G6"));
+			Salvo salvo6 = new Salvo(1, Arrays.asList("B5", "D5", "C7"));
+			Salvo salvo7 = new Salvo(2, Arrays.asList("A3", "H6"));
+			Salvo salvo8 = new Salvo(2, Arrays.asList("C5", "C6"));
+			Salvo salvo9 = new Salvo(1, Arrays.asList("G6", "H6", "A4"));
+			Salvo salvo10 = new Salvo(1, Arrays.asList("H1", "H2", "H3"));
+			Salvo salvo11 = new Salvo(2, Arrays.asList("A2", "A3", "D8"));
+			Salvo salvo12 = new Salvo(2, Arrays.asList("E1", "F2", "G3"));
+			Salvo salvo13 = new Salvo(1, Arrays.asList("A3", "A4", "F7"));
+			Salvo salvo14 = new Salvo(1, Arrays.asList("B5", "C6", "H1"));
+			Salvo salvo15 = new Salvo(2, Arrays.asList("A2", "G6", "H6"));
+			Salvo salvo16 = new Salvo(2, Arrays.asList("C5", "C7", "D5"));
+			Salvo salvo17 = new Salvo(1, Arrays.asList("A1", "A2", "A3"));
+			Salvo salvo18 = new Salvo(1, Arrays.asList("B5", "B6", "C7"));
+			Salvo salvo19 = new Salvo(2, Arrays.asList("G6", "G7", "G8"));
+			Salvo salvo20 = new Salvo(2, Arrays.asList("C6", "D6", "E6"));
+			Salvo salvo21 = new Salvo(1, Arrays.asList("H1", "H8"));
+
+			// Add salvoes to Gameplayers
+			gameplayer1.addSalvo(salvo1);
+			gameplayer2.addSalvo(salvo2);
+			gameplayer1.addSalvo(salvo3);
+			gameplayer2.addSalvo(salvo4);
+			gameplayer3.addSalvo(salvo5);
+			gameplayer4.addSalvo(salvo6);
+			gameplayer3.addSalvo(salvo7);
+			gameplayer4.addSalvo(salvo8);
+			gameplayer5.addSalvo(salvo9);
+			gameplayer6.addSalvo(salvo10);
+			gameplayer5.addSalvo(salvo11);
+			gameplayer6.addSalvo(salvo12);
+			gameplayer7.addSalvo(salvo13);
+			gameplayer8.addSalvo(salvo14);
+			gameplayer7.addSalvo(salvo15);
+			gameplayer8.addSalvo(salvo16);
+			gameplayer9.addSalvo(salvo17);
+			gameplayer10.addSalvo(salvo18);
+			gameplayer9.addSalvo(salvo19);
+			gameplayer10.addSalvo(salvo20);
+			gameplayer10.addSalvo(salvo21);
 
 			// Save gameplayer
 			gpRepository.save(gameplayer1);

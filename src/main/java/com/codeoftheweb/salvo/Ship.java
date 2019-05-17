@@ -22,7 +22,7 @@ public class Ship {
   @JoinColumn(name="game_player_id")
   private GamePlayer gamePlayer;
 
-  // Constructores
+  // Constructors
   public Ship() {}
 
   public Ship(String shipType, List<String> shipLocation) {

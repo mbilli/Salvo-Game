@@ -83,7 +83,7 @@
     margin: 45px 0 0 45px;
     position: absolute;
     width: 450px;
-
+ 
 }
 
 .grid-wrapper{
@@ -109,6 +109,7 @@
     align-items: center;
 }
 .grid-cell span{
-
+    
     margin: auto
 }
+
