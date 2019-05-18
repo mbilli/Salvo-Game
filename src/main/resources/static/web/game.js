@@ -1,35 +1,24 @@
-
-var gameGrid = document.getElementById("game-grid");
-createGrid(11, gameGrid);
-
-function createGrid (size, element){
-let wrapper = document.createElement('DIV')
-wrapper.classList.add('grid-wrapper')
-
-    for(let i = 0; i < size; i++){
-        let row = document.createElement('DIV')
-        row.classList.add('grid-row')
-        row.id =`grid-row${i}`
-        wrapper.appendChild(row)
-
-        for(let j = 0; j < size; j++){
-            let cell = document.createElement('DIV')
-            cell.classList.add('grid-cell')
-            if(i > 0 && j > 0)
-            cell.id = `grid-cell${String.fromCharCode(i+64) + j}`
-
-            if(j===0 && i > 0){
-                let textNode = document.createElement('SPAN')
-                textNode.innerText = String.fromCharCode(i+64)
-                cell.appendChild(textNode)
-            }
-            if(i === 0 && j > 0){
-                let textNode = document.createElement('SPAN')
-                textNode.innerText = j
-                cell.appendChild(textNode)
-            }
-            row.appendChild(cell)
-        }
+var gameView = document.getElementById("game-list");
+  // Defino header
+  var url = '/api/games';
+  var init = {
+    headers: {
+      'Content-Type': 'application/json',
     }
-    element.append(wrapper)
-}
+  };
+
+  // Traigo los datos
+  fetch(url, init).then(function(response) {
+    if (response.ok) {
+      return response.json();
+    }
+    // signal a server error to the chain
+    throw new Error(response.statusText);
+  }).then(function(myJson) {
+    // do something with the JSON
+    console.log(myJson);   //
+    populateGameList(myJson);
+  }).catch(function(error) {
+    // called when an error occurs anywhere in the chain
+    console.log( "Request failed: " + error.message );
+  });

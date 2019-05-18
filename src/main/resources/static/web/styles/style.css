@@ -1,6 +1,6 @@
 .grid-stack-item-content {
     background-repeat: no-repeat;
-    background-color: rgba(0,119,190,0.5);
+    
     cursor: -webkit-grab;
     cursor: -moz-grab;
 }
@@ -73,10 +73,14 @@
 
 
 .grid-ships{
-    border: solid black;
+    background-image: url(ocean.gif);
+    background-size: cover;
+    border: 2px solid rgb(128,128,128);
+    border-radius: 10px;
     height: 495px;
     width: 495px;
-    position: relative;
+    margin: auto;
+    margin-top: 10vh
 }
 
 #grid{
@@ -102,7 +106,8 @@
     box-sizing: border-box;
     width: 45px;
     height: 45px;
-    border: 0.5px solid black;
+    border: 1.3px solid rgb(128,128,128);
+    border-radius: 10px;
     vertical-align: middle;
     font-weight: bold;
     text-align: center;
@@ -112,4 +117,18 @@
     
     margin: auto
 }
+
+.busy-cell{
+    background-color: rgba(0,119,190,0.5);
+    
+}
+
+.grid-row:first-child .grid-cell{
+    background-color: rgba(170,169,173,0.7);
+}
+
+.grid-cell:first-child{
+    background-color: rgba(170,169,173,0.7);
+}
+
 
