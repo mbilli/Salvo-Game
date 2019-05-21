@@ -1,5 +1,7 @@
 let playersId = document.getElementById("players");
 let gameJson;
+let player1 = {};
+let opponent1 = {};
 const urlParams = new URLSearchParams(location.search);
 const gamePlayerParam = urlParams.get('gp');
 const yGridLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
@@ -22,32 +24,46 @@ fetch(url, init).then(function (response) {
 }).then(function (myJson) {
   // do something with the JSON
   gameJson = myJson;
-  printPlayers();
-  printShips();
+  assignPlayers(); // separo los datos del jugador y el oponente
+  printPlayers(); // Imprimo los nombres de los jugadores
+  printShips(); // Imprimo los barcos
+  printSalvoes(); // Imprimo los disparos
 }).catch(function (error) {
   // called when an error occurs anywhere in the chain
   console.log("Request failed: " + error.message);
 });
 
-// Imprime los jugadores de la partida
-function printPlayers() {
-  let player1 = "";
-  let opponent1 = "(Waiting for your opponent)";
-
-  // Asigno quien es el jugador y quien el oponente
+/*********************************************************
+ ** Asigno quien es el jugador y quien el oponente
+ *********************************************************/
+function assignPlayers() {
   gameJson.gamePlayers.map(gp => {
     if (gp.gamePlayerId == gamePlayerParam) {
-      player1 = gp.player.email;
+      player1.username = gp.player.email;
+      player1.id = gp.gamePlayerId;
     } else {
-      opponent1 = gp.player.email;
+      opponent1.username = gp.player.email;
+      opponent1.id = gp.gamePlayerId;
     }
   });
-
-  // escribo en el dom
-  playersId.innerHTML += player1 + " (you) vs ";
-  playersId.innerHTML += opponent1;
 }
 
+/*********************************************************
+ ** Imprime los jugadores de la partida
+ *********************************************************/
+function printPlayers() {
+  if (!opponent1.username) {
+    opponent1.username = "(Waiting for your opponent)";
+  }
+
+  // escribo en el dom
+  playersId.innerHTML += player1.username + " (you) vs ";
+  playersId.innerHTML += opponent1.username;
+}
+
+/*********************************************************
+ ** convierto los datos del barco a un formato simple de utilizar en la grilla
+ *********************************************************/
 function ship2Grid(ship) {
   let x0, y0, x1, y1, shipClass, temp;
 
@@ -75,11 +91,11 @@ function ship2Grid(ship) {
   if (ship.locations[0][0] === ship.locations[1][0]) {
     y1 = 1;
     x1 = temp;
-    shipClass = ship.type.toLowerCase().replace(" ","_") + "Horizontal"
+    shipClass = ship.type.toLowerCase().replace(" ", "_") + "Horizontal"
   } else {
     y1 = temp;
     x1 = 1;
-    shipClass = ship.type.toLowerCase().replace(" ","_") + "Vertical"
+    shipClass = ship.type.toLowerCase().replace(" ", "_") + "Vertical"
   }
   return {
     "x0": x0,
@@ -91,23 +107,42 @@ function ship2Grid(ship) {
   };
 }
 
-// muestra los barcos en la grilla
+/*********************************************************
+ ** muestra los barcos en la grilla
+ *********************************************************/
 function printShips() {
-  gameJson.ships.map(function (ship) {
-    ship = ship2Grid(ship);
-    grid.addWidget($('<div id="' + ship.shipType + '"><div class="grid-stack-item-content ' + ship.shipClass + '"></div><div/>'),
-      ship.x0, ship.y0, ship.x1, ship.y1);
-  });
-}
-
-// muestra los salvos en la grilla
-function printSalvoes() {
   gameJson.ships.map(function (ship) {
     ship = ship2Grid(ship);
     shipGrid.addWidget($('<div id="' + ship.shipType + '"><div class="grid-stack-item-content ' + ship.shipClass + '"></div><div/>'),
       ship.x0, ship.y0, ship.x1, ship.y1);
   });
 }
+
+/*********************************************************
+ ** muestra los salvos en la grilla de disparo y en la de los barcos
+ *********************************************************/
+function printSalvoes() {
+  let x0, y0;
+
+  gameJson.salvoes.map(function (salvoesByTurn) {
+    if (salvoesByTurn.playerId === player1.id) {
+      salvoesByTurn.locations.map(function (salvo) {
+        // Asigno x e y
+        y0 = yGridLetters.indexOf(salvo[0]);
+        x0 = parseInt(salvo[1]) - 1;
+        salvoGrid.addWidget($('<div class="salvoes-fired"></div><div/>'), x0, y0, 1, 1);
+      });
+    } else if (salvoesByTurn.playerId === opponent1.id) {
+      salvoesByTurn.locations.map(function (salvo) {
+        // Asigno x e y
+        y0 = yGridLetters.indexOf(salvo[0]);
+        x0 = parseInt(salvo[1]) - 1;
+        shipGrid.addWidget($('<div class="salvoes-received"></div><div/>'), x0, y0, 1, 1);
+      });
+    }
+  });
+}
+
 
 // Grid --------------------------------------------------------------------------------------------------------
 
@@ -140,7 +175,7 @@ const loadGrid = function () {
   $('.grid-stack').gridstack(options);
 
   shipGrid = $('#player-grid').data('gridstack');
-  salvoGrid = $('#player-grid').data('gridstack');
+  salvoGrid = $('#opponent-grid').data('gridstack');
 
   createGrid(11, $(".grid-ships"))
 

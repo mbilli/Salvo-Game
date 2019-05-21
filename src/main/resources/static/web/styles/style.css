@@ -2,6 +2,17 @@
   text-align: center;
 }
 
+.salvoes-fired, .salvoes-received {
+  background-color: red;
+  opacity: 0.3;
+  border-radius: 10px;
+  width: 45px;
+  height: 45px;
+  font-weight: bold;
+  text-align: center;
+  align-items: center;
+}
+
 
 
 
