@@ -118,7 +118,7 @@ public class GamePlayer {
     dto.put("created", this.game.getCreationDate());
     dto.put("gamePlayers", this.game.getGamePlayers().stream().map(GamePlayer::makeDTO));
     dto.put("ships", this.getShips().stream().map(Ship::makeDTO));
-    dto.put("salvoes:", this.game.getGamePlayers().stream()
+    dto.put("salvoes", this.game.getGamePlayers().stream()
             .flatMap(gamePlayer -> gamePlayer.getSalvoes().stream().map(Salvo::makeDTO)));
     return dto;
   }
