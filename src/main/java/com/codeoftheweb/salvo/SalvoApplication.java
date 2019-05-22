@@ -112,7 +112,7 @@ public class SalvoApplication {
 
 			// create Salvoes
 			Salvo salvo1 = new Salvo(1, Arrays.asList("B5", "C5", "F1"));
-			Salvo salvo2 = new Salvo(1, Arrays.asList("B4", "B5", "B6"));
+			Salvo salvo2 = new Salvo(1, Arrays.asList("B4", "C5", "B6"));
 			Salvo salvo3 = new Salvo(2, Arrays.asList("F2", "D5"));
 			Salvo salvo4 = new Salvo(2, Arrays.asList("E1", "H3", "A2"));
 			Salvo salvo5 = new Salvo(1, Arrays.asList("A2", "A4", "G6"));

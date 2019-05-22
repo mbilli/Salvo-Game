@@ -3,14 +3,8 @@
 }
 
 .salvoes-fired, .salvoes-received {
-  background-color: red;
-  opacity: 0.3;
-  border-radius: 10px;
-  width: 45px;
-  height: 45px;
-  font-weight: bold;
-  text-align: center;
-  align-items: center;
+  background-color: rgba(255, 0, 0, 0.4) !important;
+  z-index: 9999;
 }
 
 
@@ -91,7 +85,7 @@
 
 
 
-.grid-ships {
+.grid-ships-player, .grid-ships-opponent {
   background-image: url(ocean.gif);
   background-size: cover;
   border: 2px solid rgb(128, 128, 128);

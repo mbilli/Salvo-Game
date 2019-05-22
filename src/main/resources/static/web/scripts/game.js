@@ -1,3 +1,4 @@
+// Definición de variables
 let playersId = document.getElementById("players");
 let gameJson;
 let player1 = {};
@@ -5,7 +6,10 @@ let opponent1 = {};
 const urlParams = new URLSearchParams(location.search);
 const gamePlayerParam = urlParams.get('gp');
 const yGridLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-
+const cellSize = {
+  width: 10,
+  height: 10
+};
 // Defino header
 var url = '/api/game_view/' + gamePlayerParam;
 var init = {
@@ -14,24 +18,35 @@ var init = {
   }
 };
 
-// Traigo los datos
-fetch(url, init).then(function (response) {
-  if (response.ok) {
-    return response.json();
-  }
-  // signal a server error to the chain
-  throw new Error(response.statusText);
-}).then(function (myJson) {
-  // do something with the JSON
-  gameJson = myJson;
-  assignPlayers(); // separo los datos del jugador y el oponente
-  printPlayers(); // Imprimo los nombres de los jugadores
-  printShips(); // Imprimo los barcos
-  printSalvoes(); // Imprimo los disparos
-}).catch(function (error) {
-  // called when an error occurs anywhere in the chain
-  console.log("Request failed: " + error.message);
-});
+
+$(() => {
+  loadGrid();
+  dataFetch();
+})
+
+
+/*********************************************************
+ ** Traigo los datos e imprimo todo
+ *********************************************************/
+function dataFetch() {
+  fetch(url, init).then(function (response) {
+    if (response.ok) {
+      return response.json();
+    }
+    // signal a server error to the chain
+    throw new Error(response.statusText);
+  }).then(function (myJson) {
+    // do something with the JSON
+    gameJson = myJson;
+    assignPlayers(); // separo los datos del jugador y el oponente
+    printPlayers(); // Imprimo los nombres de los jugadores
+    printShips(); // Imprimo los barcos
+    printSalvoes(); // Imprimo los disparos
+  }).catch(function (error) {
+    // called when an error occurs anywhere in the chain
+    console.log("Request failed: " + error.message);
+  });
+}
 
 /*********************************************************
  ** Asigno quien es el jugador y quien el oponente
@@ -40,10 +55,10 @@ function assignPlayers() {
   gameJson.gamePlayers.map(gp => {
     if (gp.gamePlayerId == gamePlayerParam) {
       player1.username = gp.player.email;
-      player1.id = gp.gamePlayerId;
+      player1.id = gp.player.playerId;
     } else {
       opponent1.username = gp.player.email;
-      opponent1.id = gp.gamePlayerId;
+      opponent1.id = gp.player.playerId;
     }
   });
 }
@@ -122,7 +137,7 @@ function printShips() {
  ** muestra los salvos en la grilla de disparo y en la de los barcos
  *********************************************************/
 function printSalvoes() {
-  let x0, y0;
+  let x0, y0, cellId, cellEl;
 
   gameJson.salvoes.map(function (salvoesByTurn) {
     if (salvoesByTurn.playerId === player1.id) {
@@ -130,14 +145,31 @@ function printSalvoes() {
         // Asigno x e y
         y0 = yGridLetters.indexOf(salvo[0]);
         x0 = parseInt(salvo[1]) - 1;
-        salvoGrid.addWidget($('<div class="salvoes-fired"></div><div/>'), x0, y0, 1, 1);
+        cellId = x0 + (y0 * cellSize.width); // calculo el Id de la celda
+        if (cellId < 10) {
+          cellId = "0" + cellId; // si es menor que 10, uso formato 0X
+        }
+        cellId = "pl-" + cellId; // le doy el formato pl-xx
+        cellEl = document.getElementById(cellId); // busco el elemento
+        cellEl.classList[1].indexOf("empty")
+        if (cellEl.classList.contains("busy-cell")) {
+          cellEl.classList.add("salvoes-fired"); // le asigno la clase
+          cellEl.innerHTML = "<span>" + salvoesByTurn.turn + "</span>"; // le agrego el turno a la celda
+        }
       });
     } else if (salvoesByTurn.playerId === opponent1.id) {
       salvoesByTurn.locations.map(function (salvo) {
         // Asigno x e y
         y0 = yGridLetters.indexOf(salvo[0]);
         x0 = parseInt(salvo[1]) - 1;
-        shipGrid.addWidget($('<div class="salvoes-received"></div><div/>'), x0, y0, 1, 1);
+        cellId = x0 + (y0 * cellSize.width); // calculo el Id de la celda
+        if (cellId < 10) {
+          cellId = "0" + cellId; // si es menor que 10, uso formato 0X
+        }
+        cellId = "op-" + cellId; // le doy el formato op-xx
+        cellEl = document.getElementById(cellId); // busco el elemento
+        cellEl.classList.add("salvoes-received"); // le asigno la clase
+        cellEl.innerHTML = "<span>" + salvoesByTurn.turn + "</span>"; // le agrego el turno a la celda
       });
     }
   });
@@ -147,14 +179,13 @@ function printSalvoes() {
 // Grid --------------------------------------------------------------------------------------------------------
 
 
-$(() => loadGrid())
 
 //main function that shoots the gridstack.js framework and load the grid with the ships
 const loadGrid = function () {
   var options = {
     //10 x 10 grid
-    width: 10,
-    height: 10,
+    width: cellSize.width,
+    height: cellSize.height,
     //space between elements (widgets)
     verticalMargin: 0,
     //height of cells
@@ -177,7 +208,8 @@ const loadGrid = function () {
   shipGrid = $('#player-grid').data('gridstack');
   salvoGrid = $('#opponent-grid').data('gridstack');
 
-  createGrid(11, $(".grid-ships"))
+  createGrid("pl", 11, $(".grid-ships-player"))
+  createGrid("op", 11, $(".grid-ships-opponent"))
 
 
   rotateShips("carrier", 5)
@@ -197,7 +229,7 @@ const loadGrid = function () {
 
 
 //creates the grid structure
-const createGrid = function (size, element) {
+const createGrid = function (idName, size, element) {
 
   let wrapper = document.createElement('DIV')
   wrapper.classList.add('grid-wrapper')
@@ -205,14 +237,14 @@ const createGrid = function (size, element) {
   for (let i = 0; i < size; i++) {
     let row = document.createElement('DIV')
     row.classList.add('grid-row')
-    row.id = `grid-row${i}`
+    row.id = `grid-row${"-" + idName + "-" + i}`
     wrapper.appendChild(row)
 
     for (let j = 0; j < size; j++) {
       let cell = document.createElement('DIV')
       cell.classList.add('grid-cell')
       if (i > 0 && j > 0)
-        cell.id = `${i - 1}${ j - 1}`
+        cell.id = idName + "-" + `${i - 1}${ j - 1}`
 
       if (j === 0 && i > 0) {
         let textNode = document.createElement('SPAN')
@@ -272,9 +304,9 @@ const listenBusyCells = function () {
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 10; j++) {
       if (!shipGrid.isAreaEmpty(i, j)) {
-        $(`#${j}${i}`).addClass('busy-cell').removeClass('empty-cell')
+        $(`#pl-${j}${i}`).addClass('busy-cell').removeClass('empty-cell')
       } else {
-        $(`#${j}${i}`).removeClass('busy-cell').addClass('empty-cell')
+        $(`#pl-${j}${i}`).removeClass('busy-cell').addClass('empty-cell')
       }
     }
   }
