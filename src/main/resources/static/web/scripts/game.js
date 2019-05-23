@@ -149,13 +149,10 @@ function printSalvoes() {
         if (cellId < 10) {
           cellId = "0" + cellId; // si es menor que 10, uso formato 0X
         }
-        cellId = "pl-" + cellId; // le doy el formato pl-xx
+        cellId = "op-" + cellId; // le doy el formato op-xx
         cellEl = document.getElementById(cellId); // busco el elemento
-        cellEl.classList[1].indexOf("empty")
-        if (cellEl.classList.contains("busy-cell")) {
-          cellEl.classList.add("salvoes-fired"); // le asigno la clase
-          cellEl.innerHTML = "<span>" + salvoesByTurn.turn + "</span>"; // le agrego el turno a la celda
-        }
+        cellEl.classList.add("salvoes-fired"); // le asigno la clase
+        cellEl.innerHTML = "<span>" + salvoesByTurn.turn + "</span>"; // le agrego el turno a la celda
       });
     } else if (salvoesByTurn.playerId === opponent1.id) {
       salvoesByTurn.locations.map(function (salvo) {
@@ -166,10 +163,12 @@ function printSalvoes() {
         if (cellId < 10) {
           cellId = "0" + cellId; // si es menor que 10, uso formato 0X
         }
-        cellId = "op-" + cellId; // le doy el formato op-xx
+        cellId = "pl-" + cellId; // le doy el formato pl-xx
         cellEl = document.getElementById(cellId); // busco el elemento
-        cellEl.classList.add("salvoes-received"); // le asigno la clase
-        cellEl.innerHTML = "<span>" + salvoesByTurn.turn + "</span>"; // le agrego el turno a la celda
+        if (cellEl.classList.contains("busy-cell")) {
+          cellEl.classList.add("salvoes-received"); // le asigno la clase
+          cellEl.innerHTML = "<span>" + salvoesByTurn.turn + "</span>"; // le agrego el turno a la celda
+        }
       });
     }
   });

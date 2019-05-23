@@ -103,15 +103,24 @@ public class GamePlayer {
     salvoes.add(salvo);
   }
 
-  // GamePlayer DTO
+  public Score getScore() {
+    return this.game.getScores().stream().filter(score -> score.getPlayer() == this.getPlayer())
+            .findFirst().orElse(null);
+  }
+
+  // GamePlayer DTO for /games
   public Map<String, Object> makeDTO() {
     Map<String, Object> dto = new LinkedHashMap<String, Object>();
     dto.put("gamePlayerId", this.id);
     dto.put("player", this.player.makeDTO());
+    if(this.player.getScore(this.getGame()) != null)
+      dto.put("score", this.player.getScore(this.getGame()).getScore());
+    else
+      dto.put("score", this.player.getScore(this.getGame()));
     return dto;
   }
 
-  // GamePlayer DTO for game_view
+  // GamePlayer DTO for /game_view
   public Map<String, Object> makeDTOGameView() {
     Map<String, Object> dto = new LinkedHashMap<String, Object>();
     dto.put("gameId", this.game.getId());

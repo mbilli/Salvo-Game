@@ -71,6 +71,11 @@ public class Player {
     return scores;
   }
 
+  public Score getScore(Game game) {
+    return this.getScores().stream().filter(score -> game.getId() == score.getGame().getId())
+            .findFirst().orElse(null);
+  }
+
   public void setScores(Set<Score> scores) {
     this.scores = scores;
   }
