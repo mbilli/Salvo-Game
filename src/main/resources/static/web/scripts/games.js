@@ -1,4 +1,11 @@
 let gameJson;
+let leaderboardJson = [{
+    playerName: null,
+    playerScore: null,
+    playerWon: null,
+    playerLost: null,
+    playerTie: null
+}];
 
 //  ------------ Solo si estoy en las página games-list ------------------------
 if (document.getElementById("game-list")) {
