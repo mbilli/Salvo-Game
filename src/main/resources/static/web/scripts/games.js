@@ -25,7 +25,7 @@ fetch(url, init).then(function (response) {
   gameJson = myJson;
   calculateGames();
   populateLeaderboardTable();
-  //populateGameList(myJson);
+  populateGameList(myJson);
 }).catch(function (error) {
   // called when an error occurs anywhere in the chain
   console.log("Request failed: " + error.message);

@@ -1,9 +1,20 @@
 package com.codeoftheweb.salvo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,10 +32,10 @@ public class SalvoApplication {
 																		SalvoRepository salvoRepository, ScoreRepository scoreRepository) {
 		return (args) -> {
 			// save a couple of Players
-			Player jBauer = playerRepository.save(new Player("Jack", "Bauer", "j.bauer@ctu.gov"));
-			Player cObrian = playerRepository.save(new Player("Chloe", "O'Brian", "c.obrian@ctu.gov"));
-			Player kBauer = playerRepository.save(new Player("Kim", "Bauer", "kim_bauer@gmail.com"));
-			Player tAlmeida = playerRepository.save(new Player("Tony", "Almeida", "t.almeida@ctu.gov"));
+			Player jBauer = playerRepository.save(new Player("Jack", "Bauer", "j.bauer@ctu.gov", "24"));
+			Player cObrian = playerRepository.save(new Player("Chloe", "O'Brian", "c.obrian@ctu.gov", "42"));
+			Player kBauer = playerRepository.save(new Player("Kim", "Bauer", "kim_bauer@gmail.com", "kb"));
+			Player tAlmeida = playerRepository.save(new Player("Tony", "Almeida", "t.almeida@ctu.gov", "mole"));
 
 			// save a couple of Games
 			Game game1 = gameRepository.save(new Game());
@@ -182,5 +193,45 @@ public class SalvoApplication {
 			Score score7 = scoreRepository.save(new Score(cObrian, game4, 0.5));
 			Score score8 = scoreRepository.save(new Score(jBauer, game4, 0.5));
 		};
+	}
+}
+
+@Configuration
+class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
+
+	@Autowired
+	PlayerRepository playerRepository;
+
+	@Override
+	public void init(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(inputName-> {
+			Player player = playerRepository.findByUserName(inputName);
+			if (player != null) {
+				return new User(player.getUserName(), player.getPassword(),
+								AuthorityUtils.createAuthorityList("PLAYER"));
+			} else {
+				throw new UsernameNotFoundException("Unknown user: " + inputName);
+			}
+		});
+	}
+}
+
+@Configuration
+@EnableWebSecurity
+class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests()
+						.antMatchers("/admin/**").hasAuthority("ADMIN")
+						.antMatchers("/**").hasAuthority("PLAYER")
+						.and()
+						.formLogin();
+
+		http.formLogin()
+						.usernameParameter("name")
+						.passwordParameter("pwd")
+						.loginPage("/api/login");
+
+		http.logout().logoutUrl("/api/logout");
 	}
 }

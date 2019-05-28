@@ -19,6 +19,7 @@ public class Player {
   private String firstName;
   private String lastName;
   private String userName;
+  private String password;
 
   @OneToMany(mappedBy = "player", fetch = FetchType.EAGER)
   private Set<GamePlayer> gamePlayers;
@@ -26,15 +27,23 @@ public class Player {
   @OneToMany(mappedBy = "player", fetch = FetchType.EAGER)
   private Set<Score> scores;
 
+  // Constructors
   public Player() {
   }
 
-  public Player(String first, String last, String userName) {
+  public Player(String userName, String password) {
+    this.userName = userName;
+    this.password = password;
+  }
+
+  public Player(String first, String last, String userName, String password) {
     this.firstName = first;
     this.lastName = last;
     this.userName = userName;
+    this.password = password;
   }
 
+  // getter and setter
   public String getFirstName() {
     return firstName;
   }
@@ -78,6 +87,14 @@ public class Player {
 
   public void setScores(Set<Score> scores) {
     this.scores = scores;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 
   public String toString() {
