@@ -16,24 +16,24 @@ import static java.util.stream.Collectors.toList;
 @RequestMapping("/api")
 public class SalvoController {
 
-    @Autowired
-    private GameRepository gameRepository;
+  @Autowired
+  private GameRepository gameRepository;
 
-    @Autowired
-    private GamePlayerRepository gamePlayerRepository;
+  @Autowired
+  private GamePlayerRepository gamePlayerRepository;
 
-    @RequestMapping("/games")
-    public List<Map<String, Object>> getApiGames() {
-        return gameRepository
-                .findAll()
-                .stream()
-                .map(Game::makeDTO)
-                .collect(toList());
-    }
+  @RequestMapping("/games")
+  public List<Map<String, Object>> getApiGames() {
+    return gameRepository
+            .findAll()
+            .stream()
+            .map(Game::makeDTO)
+            .collect(toList());
+  }
 
-    @RequestMapping("/game_view/{gamePlayerId}")
-    public Map<String, Object> getApiGameView(@PathVariable Long gamePlayerId) {
-        GamePlayer gamePlayer = gamePlayerRepository.findById(gamePlayerId).orElse(null);
-        return gamePlayer.makeDTOGameView();
-    }
+  @RequestMapping("/game_view/{gamePlayerId}")
+  public Map<String, Object> getApiGameView(@PathVariable Long gamePlayerId) {
+    GamePlayer gamePlayer = gamePlayerRepository.findById(gamePlayerId).orElse(null);
+    return gamePlayer.makeDTOGameView();
+  }
 }
