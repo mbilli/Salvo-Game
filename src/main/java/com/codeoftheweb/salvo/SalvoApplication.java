@@ -34,15 +34,20 @@ public class SalvoApplication {
   }
 
   @Bean
+  public PasswordEncoder passwordEncoder() {
+    return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+  }
+
+  @Bean
   public CommandLineRunner initData(PlayerRepository playerRepository, GameRepository gameRepository,
                                     GamePlayerRepository gpRepository, ShipRepository shipRepository,
                                     SalvoRepository salvoRepository, ScoreRepository scoreRepository) {
     return (args) -> {
       // save a couple of Players
-      Player jBauer = playerRepository.save(new Player("Jack", "Bauer", "j.bauer@ctu.gov", "24"));
-      Player cObrian = playerRepository.save(new Player("Chloe", "O'Brian", "c.obrian@ctu.gov", "42"));
-      Player kBauer = playerRepository.save(new Player("Kim", "Bauer", "kim_bauer@gmail.com", "kb"));
-      Player tAlmeida = playerRepository.save(new Player("Tony", "Almeida", "t.almeida@ctu.gov", "mole"));
+      Player jBauer = playerRepository.save(new Player("Jack", "Bauer", "j.bauer@ctu.gov", passwordEncoder().encode("24")));
+      Player cObrian = playerRepository.save(new Player("Chloe", "O'Brian", "c.obrian@ctu.gov", passwordEncoder().encode("42")));
+      Player kBauer = playerRepository.save(new Player("Kim", "Bauer", "kim_bauer@gmail.com", passwordEncoder().encode("kb")));
+      Player tAlmeida = playerRepository.save(new Player("Tony", "Almeida", "t.almeida@ctu.gov", passwordEncoder().encode("mole")));
 
       // save a couple of Games
       Game game1 = gameRepository.save(new Game());
@@ -201,11 +206,6 @@ public class SalvoApplication {
       Score score8 = scoreRepository.save(new Score(jBauer, game4, 0.5));
     };
   }
-
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-  }
 }
 
 @Configuration
@@ -213,6 +213,9 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
   @Autowired
   PlayerRepository playerRepository;
+
+  @Autowired
+  PasswordEncoder passwordEncoder;
 
   @Override
   public void init(AuthenticationManagerBuilder auth) throws Exception {
@@ -224,7 +227,7 @@ class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
       } else {
         throw new UsernameNotFoundException("Unknown user: " + inputName);
       }
-    });
+    }).passwordEncoder(passwordEncoder);
   }
 }
 
@@ -235,13 +238,11 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http.authorizeRequests()
             .antMatchers("/web/games.html", "/api/games", "/web/scripts/games.js").permitAll()
-            .anyRequest().authenticated()
-            .and()
-            .formLogin();
+            .anyRequest().authenticated();
 
     http.formLogin()
-            .usernameParameter("name")
-            .passwordParameter("pwd")
+            .usernameParameter("username")
+            .passwordParameter("password")
             .loginPage("/api/login")
             .permitAll();
 

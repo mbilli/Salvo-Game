@@ -8,7 +8,7 @@ var init = {
   }
 };
 // contiene los datos enviados por el Backend
-let gameJson;
+let gameJson, playerJson;
 // contiene los datos calculados de los partidos en un array de jugadores
 let leaderboardJson = [];
 
@@ -22,10 +22,11 @@ fetch(url, init).then(function (response) {
   throw new Error(response.statusText);
 }).then(function (myJson) {
   // do something with the JSON
-  gameJson = myJson;
+  gameJson = myJson.games;
+  playerJson = myJson.player;
   calculateGames();
   populateLeaderboardTable();
-  populateGameList(myJson);
+  populateGameList(gameJson);
 }).catch(function (error) {
   // called when an error occurs anywhere in the chain
   console.log("Request failed: " + error.message);
@@ -38,7 +39,7 @@ fetch(url, init).then(function (response) {
 function populateGameList(myJson) {
   myJson.forEach(game => {
     var gameDate = new Date(game.created);
-    gameList.innerHTML += "<li>GAME ID: " + game.gameId + " - CREATED: " + gameDate.toLocaleString() +
+    gameList.innerHTML += "<li class='list-group-item'>GAME ID: " + game.gameId + " - CREATED: " + gameDate.toLocaleString() +
       " - PLAYERS: " + game.gamePlayers.map(players => (players.player.email)).join(", ") + "</li>";
   });
 }
