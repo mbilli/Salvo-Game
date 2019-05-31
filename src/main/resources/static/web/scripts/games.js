@@ -12,6 +12,8 @@ let gameJson, playerJson;
 // contiene los datos calculados de los partidos en un array de jugadores
 let leaderboardJson = [];
 
+var loginForm = document.getElementById("login-form");
+
 
 // Traigo los datos
 fetch(url, init).then(function (response) {
@@ -119,4 +121,13 @@ function leaderboardSorted(leaderboard) {
     }
     return playerA.tied - playerB.tied;
   });
+}
+
+function showHideLogin() {
+  if (loginForm.style.display == "none"){
+    loginForm.style.display = "";
+  }
+  else {
+    loginForm.style.display = "none";
+  }
 }
