@@ -1,16 +1,14 @@
 package com.codeoftheweb.salvo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -20,6 +18,9 @@ public class SalvoController {
 
   @Autowired
   private GameRepository gameRepository;
+
+  @Autowired
+  PasswordEncoder passwordencoder;
 
   @Autowired
   private PlayerRepository playerRepository;
@@ -45,6 +46,27 @@ public class SalvoController {
     return gamePlayer.makeDTOGameView();
   }
 
+  @RequestMapping(path = "/players", method = RequestMethod.POST)
+  public ResponseEntity<Map<String, Object>> createPlayer(@RequestParam String username, @RequestParam String password) {
+    if (username.isEmpty()) {
+      return new ResponseEntity<>(makeMap("error", "No name"), HttpStatus.FORBIDDEN);
+    }
+    Player player = playerRepository.findByUserName(username);
+    if (player != null) {
+      return new ResponseEntity<>(makeMap("error", "Username in use"), HttpStatus.FORBIDDEN);
+    }
+    Player newPlayer = playerRepository.save(new Player(username, passwordencoder.encode(password)));
+    return new ResponseEntity<>(makeMap("username", newPlayer.getUserName()), HttpStatus.CREATED);
+  }
+
+  // Crea y devuelve un map con los parámetros indicados
+  private Map<String, Object> makeMap(String key, Object value) {
+    Map<String, Object> map = new HashMap<>();
+    map.put(key, value);
+    return map;
+  }
+
+  // Indica si el usuario no ingreso al sistema
   private boolean isGuest(Authentication authentication) {
     return authentication == null || authentication instanceof AnonymousAuthenticationToken;
   }
