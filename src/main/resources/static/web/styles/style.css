@@ -7,6 +7,61 @@
   z-index: 9999;
 }
 
+#login-form, #signup-form {
+  position: absolute;
+  background-color: white;
+  border: 1px solid grey;
+  padding: 20px;
+	display: none;
+	margin-top: 1px;
+	width: 350px;
+	z-index: 1;
+}
+
+#main-body {
+	visibility: hidden;
+}
+
+#reload-body img{
+	width: 50px;
+	margin: auto;
+	display: block;
+	animation: reload-move 5s infinite;
+	margin-top: 25%;
+}
+@keyframes reload-move {
+    from {transform: rotate(360deg);}
+    to {transform: rotate(0deg);}
+}
+
+#player-name {
+	margin-right: 20px;
+}
+
+#signup-error, #login-error {
+	color: red;
+}
+
+.login-button, .signup-button, .logout-button {
+	background-color: black;
+	border-radius: 5px;
+	border: 1px solid black;
+	padding: 3px 10px;
+	width: 80px;
+	color: white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

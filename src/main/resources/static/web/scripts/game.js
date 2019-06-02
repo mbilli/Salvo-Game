@@ -18,7 +18,6 @@ var init = {
   }
 };
 
-
 $(() => {
   loadGrid();
   dataFetch();
@@ -61,6 +60,7 @@ function assignPlayers() {
       opponent1.id = gp.player.playerId;
     }
   });
+	document.getElementById("player-name").innerHTML = 'Hello <strong>' + player1.username + '</strong>';
 }
 
 /*********************************************************
@@ -174,6 +174,16 @@ function printSalvoes() {
   });
 }
 
+/*********************************************************
+ ** Función de log out
+ *********************************************************/
+function playerSignOut() {
+	$.post("/api/logout")
+		.done(function () {
+			window.location.replace("/web/games.html");
+			console.log("logged out");
+		})
+}
 
 // Grid --------------------------------------------------------------------------------------------------------
 

@@ -2,46 +2,53 @@
 <html>
 
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="dist/normalize.css" />
-  <link rel="stylesheet" href="dist/gridstack.css" />
-  <link rel="stylesheet" href="dist/gridstack-extra.css" />
-  <link rel="stylesheet" href="styles/style.css" />
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="dist/normalize.css" />
+	<link rel="stylesheet" href="dist/gridstack.css" />
+	<link rel="stylesheet" href="dist/gridstack-extra.css" />
+	<link rel="stylesheet" href="styles/style.css" />
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-  <title>Ship Locations</title>
+	<title>Ship Locations</title>
 </head>
 
 <body class="container">
 
+	<div id="login-signup-panel" class="row justify-content-end">
+		<div class="row justify-content-end mt-2">
+			<div class="col-auto">
+				<span id="player-name"></span><button onclick="playerSignOut()" class="logout-button">Log Out</button>
+			</div>
+		</div>
+	</div>
 
-  <div id="page-title">
-    <h4 id="players">Players: </h4>
-  </div>
+	<div id="page-title">
+		<h4 id="players">Players: </h4>
+	</div>
 
-  <div class="row">
-    <div class="col">
-      <h5 class="text-center mt-3">Your Boats</h5>
-      <div class="grid-ships-player">
-        <div id="player-grid" class="grid-stack grid-stack-10"></div>
-      </div>
-    </div>
+	<div class="row">
+		<div class="col">
+			<h5 class="text-center mt-3">Your Boats</h5>
+			<div class="grid-ships-player">
+				<div id="player-grid" class="grid-stack grid-stack-10"></div>
+			</div>
+		</div>
 
-    <div class="col">
-      <h5 class="text-center mt-3">Opponent Boats</h5>
-      <div class="grid-ships-opponent" class="col">
-        <div id="opponent-grid" class="grid-stack grid-stack-10"></div>
-      </div>
-    </div>
-  </div>
+		<div class="col">
+			<h5 class="text-center mt-3">Opponent Boats</h5>
+			<div class="grid-ships-opponent" class="col">
+				<div id="opponent-grid" class="grid-stack grid-stack-10"></div>
+			</div>
+		</div>
+	</div>
 
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
-  <script src="dist/jquery-ui.min.js"></script>
-  <script src="dist/gridstack.js"></script>
-  <script src="dist/gridstack.jQueryUI.js"></script>
-  <script src="dist/jquery.ui.touch-punch.min.js"></script>
-  <script src="scripts/game.js"></script>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
+	<script src="dist/jquery-ui.min.js"></script>
+	<script src="dist/gridstack.js"></script>
+	<script src="dist/gridstack.jQueryUI.js"></script>
+	<script src="dist/jquery.ui.touch-punch.min.js"></script>
+	<script src="scripts/game.js"></script>
 </body>
 
 </html>
