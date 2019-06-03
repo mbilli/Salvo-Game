@@ -48,15 +48,19 @@ public class SalvoController {
 
   @RequestMapping(path = "/players", method = RequestMethod.POST)
   public ResponseEntity<Map<String, Object>> createPlayer(@RequestParam String username, @RequestParam String password) {
-    if (username.isEmpty()) {
-      return new ResponseEntity<>(makeMap("error", "No name"), HttpStatus.FORBIDDEN);
+    ResponseEntity messageResponse;
+    if (username.isEmpty() || password.isEmpty()) {
+      messageResponse = new ResponseEntity<>(makeMap("error", "Username and Password is required"), HttpStatus.FORBIDDEN);
+    } else {
+      Player player = playerRepository.findByUserName(username);
+      if (player != null) {
+        messageResponse = new ResponseEntity<>(makeMap("error", "Username in use"), HttpStatus.FORBIDDEN);
+      } else {
+      Player newPlayer = playerRepository.save(new Player(username, passwordencoder.encode(password)));
+      messageResponse = new ResponseEntity<>(makeMap("username", newPlayer.getUserName()), HttpStatus.CREATED);
     }
-    Player player = playerRepository.findByUserName(username);
-    if (player != null) {
-      return new ResponseEntity<>(makeMap("error", "Username in use"), HttpStatus.FORBIDDEN);
     }
-    Player newPlayer = playerRepository.save(new Player(username, passwordencoder.encode(password)));
-    return new ResponseEntity<>(makeMap("username", newPlayer.getUserName()), HttpStatus.CREATED);
+    return messageResponse;
   }
 
   // Crea y devuelve un map con los parámetros indicados

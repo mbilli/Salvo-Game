@@ -144,26 +144,24 @@ function leaderboardSorted(leaderboard) {
 
 /*********************************************************
  ** Chequea los campos ingresados en log in y sign up
- ** devuelve un mensaje con el error o null si no hubiera errores
+ ** devuelve un mensaje con el error o nada si no hubiera errores
  *********************************************************/
 function checkPlayerFields(email, password) {
+	let errorMessage = "";
+	
 	if (email.length < 3) {
-		return "Enter a valid email!"
-	};
-	if (email.indexOf(" ") !== -1) {
-		return "Email must not have spaces!"
-	};
-	if (email.indexOf("@") === -1) {
-		return "Email must have @!"
-	};
-	if (password.indexOf(" ") !== -1) {
-		return "Password must not have spaces!"
-	};
-	if (password.length === 0) {
-		return "Password is required!"
-	};
+		errorMessage = "Enter a valid email!";
+	} else if (email.indexOf(" ") !== -1) {
+		errorMessage = "Email must not have spaces!";
+	} else if (email.indexOf("@") === -1) {
+		errorMessage = "Email must have @!";
+	} else if (password.indexOf(" ") !== -1) {
+		errorMessage = "Password must not have spaces!";
+	} else if (password.length === 0) {
+		errorMessage = "Password is required!";
+	}
 
-	return null;
+	return errorMessage;
 }
 
 /*********************************************************
