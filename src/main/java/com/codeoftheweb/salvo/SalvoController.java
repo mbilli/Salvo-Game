@@ -41,9 +41,18 @@ public class SalvoController {
   }
 
   @RequestMapping("/game_view/{gamePlayerId}")
-  public Map<String, Object> getApiGameView(@PathVariable Long gamePlayerId) {
+  public ResponseEntity<Map<String, Object>> getApiGameView(@PathVariable Long gamePlayerId, Authentication authentication) {
     GamePlayer gamePlayer = gamePlayerRepository.findById(gamePlayerId).orElse(null);
-    return gamePlayer.makeDTOGameView();
+    Player player = playerRepository.findByUserName(authentication.getName());
+    ResponseEntity messageResponse;
+
+    if(gamePlayer.getPlayer().getId() == player.getId()) {
+      messageResponse = new ResponseEntity<>(gamePlayer.makeDTOGameView(), HttpStatus.OK);
+    } else {
+      messageResponse = new ResponseEntity<>(makeMap("unauthorized", "This is not your game"), HttpStatus.UNAUTHORIZED);
+    }
+
+    return messageResponse;
   }
 
   @RequestMapping(path = "/players", method = RequestMethod.POST)

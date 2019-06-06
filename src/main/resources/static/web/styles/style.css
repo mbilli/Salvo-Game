@@ -2,53 +2,68 @@
   text-align: center;
 }
 
-.salvoes-fired, .salvoes-received {
+.salvoes-fired,
+.salvoes-received {
   background-color: rgba(255, 0, 0, 0.4) !important;
   z-index: 9999;
 }
 
-#login-form, #signup-form {
+#login-form,
+#signup-form {
   position: absolute;
   background-color: white;
   border: 1px solid grey;
   padding: 20px;
-	display: none;
-	margin-top: 1px;
-	width: 350px;
-	z-index: 1;
+  display: none;
+  margin-top: 1px;
+  width: 350px;
+  z-index: 1;
 }
 
 #main-body {
-	visibility: hidden;
+  visibility: hidden;
 }
 
-#reload-body img{
-	width: 50px;
-	margin: auto;
-	display: block;
-	animation: reload-move 5s infinite;
-	margin-top: 25%;
+#reload-body img {
+  width: 50px;
+  margin: auto;
+  display: block;
+  animation: reload-move 5s infinite;
+  margin-top: 25%;
 }
+
 @keyframes reload-move {
-    from {transform: rotate(360deg);}
-    to {transform: rotate(0deg);}
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
 }
 
 #player-name {
-	margin-right: 20px;
+  margin-right: 20px;
 }
 
-#signup-error, #login-error {
-	color: red;
+#signup-error,
+#login-error {
+  color: red;
 }
 
-.login-button, .signup-button, .logout-button {
-	background-color: black;
-	border-radius: 5px;
-	border: 1px solid black;
-	padding: 3px 10px;
-	width: 80px;
-	color: white;
+.login-button,
+.signup-button,
+.logout-button {
+  background-color: black;
+  border-radius: 5px;
+  border: 1px solid black;
+  padding: 3px 10px;
+  width: 80px;
+  color: white;
+}
+
+.join-game-link li {
+  color: blue;
 }
 
 
@@ -140,7 +155,8 @@
 
 
 
-.grid-ships-player, .grid-ships-opponent {
+.grid-ships-player,
+.grid-ships-opponent {
   background-image: url(ocean.gif);
   background-size: cover;
   border: 2px solid rgb(128, 128, 128);

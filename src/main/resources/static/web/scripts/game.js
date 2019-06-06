@@ -43,7 +43,7 @@ function dataFetch() {
     printSalvoes(); // Imprimo los disparos
   }).catch(function (error) {
     // called when an error occurs anywhere in the chain
-    console.log("Request failed: " + error.message);
+    console.log("Request failed: " + error);
   });
 }
 
