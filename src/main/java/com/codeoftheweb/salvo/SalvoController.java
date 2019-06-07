@@ -18,13 +18,10 @@ public class SalvoController {
 
   @Autowired
   private GameRepository gameRepository;
-
   @Autowired
   PasswordEncoder passwordencoder;
-
   @Autowired
   private PlayerRepository playerRepository;
-
   @Autowired
   private GamePlayerRepository gamePlayerRepository;
 
@@ -40,18 +37,31 @@ public class SalvoController {
     return dto;
   }
 
+  @RequestMapping(value = "/games", method = RequestMethod.POST)
+  public ResponseEntity<Map<String, Object>> createGame(Authentication authentication) {
+    ResponseEntity messageResponse;
+    if(isGuest(authentication)) {
+      messageResponse = new ResponseEntity<>(makeMap("unauthorized", "You must be logged"), HttpStatus.UNAUTHORIZED);
+    } else {
+      Game game = gameRepository.save(new Game());
+      Player player = playerRepository.findByUserName(authentication.getName());
+      GamePlayer gameplayer = new GamePlayer(player, game);
+      gamePlayerRepository.save(gameplayer);
+      messageResponse = new ResponseEntity<>(makeMap("gamePlayerId", gameplayer.getId()), HttpStatus.CREATED);
+    }
+    return messageResponse;
+  }
+
   @RequestMapping("/game_view/{gamePlayerId}")
   public ResponseEntity<Map<String, Object>> getApiGameView(@PathVariable Long gamePlayerId, Authentication authentication) {
     GamePlayer gamePlayer = gamePlayerRepository.findById(gamePlayerId).orElse(null);
     Player player = playerRepository.findByUserName(authentication.getName());
     ResponseEntity messageResponse;
-
     if(gamePlayer.getPlayer().getId() == player.getId()) {
       messageResponse = new ResponseEntity<>(gamePlayer.makeDTOGameView(), HttpStatus.OK);
     } else {
       messageResponse = new ResponseEntity<>(makeMap("unauthorized", "This is not your game"), HttpStatus.UNAUTHORIZED);
     }
-
     return messageResponse;
   }
 

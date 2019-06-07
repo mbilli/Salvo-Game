@@ -24,6 +24,10 @@
   visibility: hidden;
 }
 
+#logout-panel {
+  display: none;
+}
+
 #reload-body img {
   width: 50px;
   margin: auto;

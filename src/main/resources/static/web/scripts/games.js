@@ -1,6 +1,4 @@
 // Declaración de variables
-var gameList = document.getElementById("game-list");
-var leaderboardTable = document.getElementById("leaderboard-table");
 // Defino header
 var url = '/api/games';
 var init = {
@@ -13,9 +11,12 @@ let gameJson, playerJson;
 // contiene los datos calculados de los partidos en un array de jugadores
 let leaderboardJson = [];
 
+var gameList = document.getElementById("game-list");
+var leaderboardTable = document.getElementById("leaderboard-table-data");
 var reloadBody = document.getElementById("reload-body");
 var mainBody = document.getElementById("main-body");
 var logInSignUpPanel = document.getElementById("login-signup-panel");
+var logOutPanel = document.getElementById("logout-panel");
 var logInForm = document.getElementById("login-form");
 var signUpForm = document.getElementById("signup-form");
 var logInEmail = document.getElementById("input-login-email");
@@ -27,24 +28,9 @@ var checkShowSignUpPassword = document.getElementById("show-signup-password");
 var logInError = document.getElementById("login-error");
 var signUpError = document.getElementById("signup-error");
 
-var logOutHTML = '<div class="row justify-content-end mt-2">' +
-  '<div class="col-auto">' +
-  '<span id="player-name"></span><button onclick="playerSignOut()" class="logout-button">Log Out</button>' +
-  '</div>' +
-  '</div>';
 
-
-// Traigo los datos del backend
-fetch(url, init).then(function (response) {
-  if (response.ok) {
-    return response.json();
-  }
-  // signal a server error to the chain
-  throw new Error(response.statusText);
-}).then(function (myJson) {
-  // do something with the JSON
-  gameJson = myJson.games;
-  playerJson = myJson.player;
+// Traigo los datos del backend, calcula leaderboard e imprime el html
+fetchFunction(url, init).then(function (myJson) {
   calculateGames();
   htmlRender();
 }).catch(function (error) {
@@ -52,12 +38,31 @@ fetch(url, init).then(function (response) {
   console.log("Request failed: " + error.message);
 });
 
+
 // Funciones
+/*********************************************************
+ ** Trae los datos del backend, crea gameJson, playerJson, 
+ *********************************************************/
+function fetchFunction(url, init) {
+  return fetch(url, init).then(function (response) {
+    if (response.ok) {
+      return response.json();
+    }
+    // signal a server error to the chain
+    throw new Error(response.statusText);
+  }).then(function (myJson) {
+    // do something with the JSON
+    gameJson = myJson.games;
+    playerJson = myJson.player;
+  });
+}
+
 /*********************************************************
  ** Imprime los datos de las lista de juegos
  ** recibe el json
  *********************************************************/
 function populateGameList(myJson) {
+  gameList.innerHTML = "";
   myJson.forEach(game => {
     let gameDate = new Date(game.created);
     let playersEmail = game.gamePlayers.map(gamePlayer => (gamePlayer.player.email));
@@ -92,6 +97,7 @@ function populateLeaderboardTable() {
   // Ordeno el json dependiendo del score y los partidos ganados, perdidos o empatados
   leaderboardJson = leaderboardSorted(leaderboardJson);
   // imprimo
+  leaderboardTable.innerHTML = "";
   leaderboardJson.forEach(player => {
     leaderboardTable.innerHTML += "<tr><th>" + player.playerName + "</th><td>" + player.score + "</td><td>" +
       player.won + "</td><td>" + player.lost + "</td><td>" + player.tied + "</td></tr>"
@@ -200,7 +206,13 @@ function playerLogIn() {
         password: passwordValue
       })
       .done(function () {
-        location.reload();
+        // recargo los datos e imprimo el html
+        fetchFunction(url, init).then(function () {
+          htmlRender();
+        }).catch(function (error) {
+          // called when an error occurs anywhere in the chain
+          console.log("Request failed: " + error.message);
+        });
         console.log("logged in!");
       })
       .fail(function (xhr) {
@@ -208,6 +220,7 @@ function playerLogIn() {
         console.log(xhr);
       })
   }
+  eraseFields();
 }
 
 /*********************************************************
@@ -233,7 +246,13 @@ function playerSignUp() {
             password: passwordValue
           })
           .done(function () {
-            location.reload();
+            // recargo los datos e imprimo el html
+            fetchFunction(url, init).then(function () {
+              htmlRender();
+            }).catch(function (error) {
+              // called when an error occurs anywhere in the chain
+              console.log("Request failed: " + error.message);
+            });
             console.log("logged in!");
           })
       })
@@ -242,6 +261,7 @@ function playerSignUp() {
         console.log(xhr);
       })
   }
+  eraseFields();
 }
 
 /*********************************************************
@@ -250,8 +270,41 @@ function playerSignUp() {
 function playerSignOut() {
   $.post("/api/logout")
     .done(function () {
-      location.reload();
+      // recargo los datos e imprimo el html
+      fetchFunction(url, init).then(function () {
+        htmlRender();
+      }).catch(function (error) {
+        // called when an error occurs anywhere in the chain
+        console.log("Request failed: " + error.message);
+      });
       console.log("logged out");
+    })
+}
+
+/*********************************************************
+ ** Función de borra los campos de log in y log out
+ *********************************************************/
+function eraseFields() {
+  signUpEmail.value = "";
+  signUpPassword.value = "";
+  logInEmail.value = "";
+  logInPassword.value = "";
+  logInForm.style.display = "none";
+  signUpForm.style.display = "none";
+}
+
+/*********************************************************
+ ** Función que crea un juego nuevo
+ *********************************************************/
+function createNewGame() {
+  $.post("/api/games")
+    .done(function (response) {
+      console.log("Game created (ID = " + response.gamePlayerId + ")");
+      window.location.href = "/web/game.html?gp=" + response.gamePlayerId;
+    })
+    .fail(function (xhr) {
+      console.log(xhr);
+      alert(xhr.responseJSON.unauthorized);
     })
 }
 
@@ -302,8 +355,12 @@ function showSignUpPassword() {
 function htmlRender() {
   // si el jugador está logueado muestra botón de log out, sino log in y sign up
   if (playerJson) {
-    logInSignUpPanel.innerHTML = logOutHTML;
+    logInSignUpPanel.style.display = "none";
+    logOutPanel.style.display = "block";
     document.getElementById("player-name").innerHTML = 'Hello <strong>' + playerJson.email + '</strong>';
+  } else if (logInSignUpPanel.style.display == "none") {
+    logOutPanel.style.display = "none";
+    logInSignUpPanel.style.display = "block";
   }
   // armo la tabla de posiciones
   populateLeaderboardTable();
