@@ -1,5 +1,6 @@
 package com.codeoftheweb.salvo;
 
+import org.aspectj.apache.bcel.util.Play;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,31 @@ public class SalvoController {
       GamePlayer gameplayer = new GamePlayer(player, game);
       gamePlayerRepository.save(gameplayer);
       messageResponse = new ResponseEntity<>(makeMap("gamePlayerId", gameplayer.getId()), HttpStatus.CREATED);
+    }
+    return messageResponse;
+  }
+
+  @RequestMapping(value = "/games/{gameId}/players", method = RequestMethod.POST)
+  public ResponseEntity<Map<String, Object>> joinGame(@PathVariable Long gameId, Authentication authentication) {
+    ResponseEntity messageResponse;
+    if(isGuest(authentication)) {
+      messageResponse = new ResponseEntity<>(makeMap("unauthorized", "You must be logged"), HttpStatus.UNAUTHORIZED);
+    } else {
+      Game game = gameRepository.findById(gameId).orElse(null);
+      if(game == null) {
+        messageResponse = new ResponseEntity<>(makeMap("forbidden", "Game does not exist"), HttpStatus.FORBIDDEN);
+      } else if(game.getGamePlayers().size() > 1) {
+        messageResponse = new ResponseEntity<>(makeMap("forbidden", "Game is already full"), HttpStatus.FORBIDDEN);
+      } else {
+        Player player = playerRepository.findByUserName(authentication.getName());
+        if(game.getGamePlayers().stream().map(gp->gp.getPlayer().getId()).collect(toList()).contains(player.getId())){
+          messageResponse = new ResponseEntity<>(makeMap("forbidden", "You are already in this game"), HttpStatus.FORBIDDEN);
+        } else {
+          GamePlayer gameplayer = new GamePlayer(player, game);
+          gamePlayerRepository.save(gameplayer);
+          messageResponse = new ResponseEntity<>(makeMap("gamePlayerId", gameplayer.getId()), HttpStatus.CREATED);
+        }
+      }
     }
     return messageResponse;
   }
