@@ -27,6 +27,8 @@ var checkShowLogInPassword = document.getElementById("show-login-password");
 var checkShowSignUpPassword = document.getElementById("show-signup-password");
 var logInError = document.getElementById("login-error");
 var signUpError = document.getElementById("signup-error");
+var playerName = document.getElementById("player-name");
+var createGameButton = document.getElementById("create-game-button");
 
 
 // Traigo los datos del backend, calcula leaderboard e imprime el html
@@ -56,8 +58,6 @@ function fetchFunction(url, init) {
 		playerJson = myJson.player;
 	});
 }
-
-
 
 /*********************************************************
  ** Imprime la tabla de posiciones
@@ -146,12 +146,14 @@ function populateGameList(myJson) {
 	myJson.forEach(game => {
 		let gameDate = new Date(game.created);
 		let playersEmail = game.gamePlayers.map(gamePlayer => (gamePlayer.player.email));
+		// Variable que indica si un juego tiene un gameplayer perteneciente al jugador actual
 		let playersGamePlayer = null;
-		// defino el html de la lista
-		let gameHTML = "<li class='list-group-item'>GAME ID: " + game.gameId + " - CREATED: " + gameDate.toLocaleString() +
-			" - PLAYERS: " + playersEmail.join(", ") + "</li>";
+		// defino el html de la lista sin <li></li>
+		let gameHTML = "GAME ID:" + game.gameId + " - CREATED: " + gameDate.toLocaleString() +
+			" - PLAYERS: " + playersEmail.join(", ");
 
 		// Para agregar links a los juegos, el jugador debe estar logueado
+		// Para agregar el botón de unirse, el jugador debe estar logueado
 		if (playerJson) {
 			// Reviso si el juego pertenece al jugador y con que gameplayer id
 			game.gamePlayers.forEach(gamePlayer => {
@@ -163,9 +165,13 @@ function populateGameList(myJson) {
 			if (playersGamePlayer) {
 				gameHTML = "<a href='game.html?gp=" + playersGamePlayer + "' class='join-game-link'>" + gameHTML + "</a>";
 			}
+			// Si el juego no esta lleno y no el jugador aún no participa, agrego el botón de join
+			if (game.gamePlayers.length < 2 && !playersGamePlayer) {
+				gameHTML += "<button onclick='joinAGame(" + game.gameId + ")' class='join-game-button'>Join Game -></button>";
+			}
 		}
-		// Agrego la lista al html
-		gameList.innerHTML += gameHTML;
+		// Agrego la lista al html con <li></li>
+		gameList.innerHTML += "<li class='list-group-item'>" + gameHTML + "</li>";
 	});
 }
 
@@ -311,6 +317,21 @@ function createNewGame() {
 }
 
 /*********************************************************
+ ** Función que une un jugador con un juego existente
+ ** Recibe el ID del juego al que debe unirse
+ *********************************************************/
+function joinAGame(gameId) {
+	$.post("/api/games/" + gameId + "/players")
+		.done(function (response) {
+			window.location.href = "/web/game.html?gp=" + response.gamePlayerId;
+		})
+		.fail(function (xhr) {
+			alert(xhr.responseJSON.forbidden);
+			console.log(xhr);
+		})
+}
+
+/*********************************************************
  ** DOM Functions
  *********************************************************/
 // muestra u oculta el panel de log in
@@ -359,10 +380,12 @@ function htmlRender() {
 	if (playerJson) {
 		logInSignUpPanel.style.display = "none";
 		logOutPanel.style.display = "block";
-		document.getElementById("player-name").innerHTML = 'Hello <strong>' + playerJson.email + '</strong>';
+		playerName.innerHTML = 'Hello <strong>' + playerJson.email + '</strong>';
+		createGameButton.innerHTML = '<button onclick="createNewGame()" class="create-game-button">New game</button>';
 	} else if (logInSignUpPanel.style.display == "none") {
 		logOutPanel.style.display = "none";
 		logInSignUpPanel.style.display = "block";
+		createGameButton.innerHTML = "";
 	}
 	// armo la tabla de posiciones
 	populateLeaderboardTable();

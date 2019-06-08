@@ -43,7 +43,9 @@ function dataFetch() {
     printSalvoes(); // Imprimo los disparos
   }).catch(function (error) {
     // called when an error occurs anywhere in the chain
+		alert("Request failed: " + error);
     console.log("Request failed: " + error);
+		window.location.replace("/web/games.html");
   });
 }
 

@@ -28,6 +28,7 @@
   display: none;
 }
 
+/* animación de carga de página */
 #reload-body img {
   width: 50px;
   margin: auto;
@@ -35,7 +36,6 @@
   animation: reload-move 5s infinite;
   margin-top: 25%;
 }
-
 @keyframes reload-move {
   from {
     transform: rotate(360deg);
@@ -55,6 +55,11 @@
   color: red;
 }
 
+.join-game-link li {
+  color: blue;
+}
+
+/* Botones */
 .login-button,
 .signup-button,
 .logout-button {
@@ -66,18 +71,31 @@
   color: white;
 }
 
-.join-game-link li {
-  color: blue;
+.create-game-button {
+	width: 100px;
+	margin-bottom: 5px;
+	border-radius: 5px;
+	border: 2px solid black;
+	color: white;
+	background-color: black;
+}
+.create-game-button:hover {
+	color: black;
+	background-color: white;
 }
 
-
-
-
-
-
-
-
-
+.join-game-button {
+	width: 130px;
+	margin-left: 15px;
+	border-radius: 5px;
+	border: 2px solid black;
+	color: white;
+	background-color: black;
+}
+.join-game-button:hover {
+	color: black;
+	background-color: white;
+}
 
 
 
