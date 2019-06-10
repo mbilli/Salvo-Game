@@ -19,7 +19,6 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.authorizeRequests()
             .antMatchers("/rest/**").denyAll()
             .antMatchers("/api/game_view/**").hasAnyAuthority("PLAYER")
-            .antMatchers("/web/game.html").hasAnyAuthority("PLAYER")
             .anyRequest().permitAll();
 
     http.formLogin()

@@ -1,10 +1,31 @@
 // Definición de variables
-let playersId = document.getElementById("players");
 let gameJson;
 let player1 = {};
 let opponent1 = {};
 const urlParams = new URLSearchParams(location.search);
 const gamePlayerParam = urlParams.get('gp');
+const typesOfShip = {
+  carrier: {
+    name: "Carrier",
+    size: 5
+  },
+  battleship: {
+    name: "Battleship",
+    size: 4
+  },
+  submarine: {
+    name: "Submarine",
+    size: 3
+  },
+  destroyer: {
+    name: "Destroyer",
+    size: 3
+  },
+  patrolBoat: {
+    name: "Patrol Boat",
+    size: 2
+  }
+}
 const yGridLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 const cellSize = {
   width: 10,
@@ -18,17 +39,33 @@ var init = {
   }
 };
 
+var playersId = document.getElementById("players");
+var logOutPanel = document.getElementById("logout-panel");
+
+
+// Cargo la grilla, traigo los datos del backend e imprimo todo
 $(() => {
   loadGrid();
-  dataFetch();
+  dataFetch().then(function (myJson) {
+    logOutPanel.style.display = "block";
+    assignPlayers(); // separo los datos del jugador y el oponente
+    printPlayers(); // Imprimo los nombres de los jugadores
+    printShips(); // Imprimo los barcos
+    printSalvoes(); // Imprimo los disparos
+  }).catch(function (error) {
+    // called when an error occurs anywhere in the chain
+    alert("Request failed: " + error);
+    console.log("Request failed: " + error);
+    window.location.replace("/web/games.html");
+  });
 })
 
-
+// Funciones
 /*********************************************************
- ** Traigo los datos e imprimo todo
+ ** Traigo los datos y los asigno a gameJson
  *********************************************************/
 function dataFetch() {
-  fetch(url, init).then(function (response) {
+  return fetch(url, init).then(function (response) {
     if (response.ok) {
       return response.json();
     }
@@ -37,15 +74,6 @@ function dataFetch() {
   }).then(function (myJson) {
     // do something with the JSON
     gameJson = myJson;
-    assignPlayers(); // separo los datos del jugador y el oponente
-    printPlayers(); // Imprimo los nombres de los jugadores
-    printShips(); // Imprimo los barcos
-    printSalvoes(); // Imprimo los disparos
-  }).catch(function (error) {
-    // called when an error occurs anywhere in the chain
-		alert("Request failed: " + error);
-    console.log("Request failed: " + error);
-		window.location.replace("/web/games.html");
   });
 }
 
@@ -62,7 +90,7 @@ function assignPlayers() {
       opponent1.id = gp.player.playerId;
     }
   });
-	document.getElementById("player-name").innerHTML = 'Hello <strong>' + player1.username + '</strong>';
+  document.getElementById("player-name").innerHTML = 'Hello <strong>' + player1.username + '</strong>';
 }
 
 /*********************************************************
@@ -79,6 +107,24 @@ function printPlayers() {
 }
 
 /*********************************************************
+ ** Crea barcos en la grilla aleatoriamente
+ *********************************************************/
+function createRandomShips() {
+  
+}
+
+/*********************************************************
+ ** muestra los barcos en la grilla
+ *********************************************************/
+function printShips() {
+  gameJson.ships.map(function (ship) {
+    ship = ship2Grid(ship);
+    shipGrid.addWidget($('<div id="' + ship.shipType + '"><div class="grid-stack-item-content ' + ship.shipClass + '"></div><div/>'),
+      ship.x0, ship.y0, ship.x1, ship.y1);
+  });
+}
+
+/*********************************************************
  ** convierto los datos del barco a un formato simple de utilizar en la grilla
  *********************************************************/
 function ship2Grid(ship) {
@@ -90,20 +136,20 @@ function ship2Grid(ship) {
 
   // Asigno longitud y ancho del barco
   switch (ship.type) {
-    case "Carrier":
-      temp = 5;
+    case typesOfShip.carrier.name:
+      temp = typesOfShip.carrier.size;
       break;
-    case "Battleship":
-      temp = 4;
+    case typesOfShip.battleship.name:
+      temp = typesOfShip.battleship.size;
       break;
-    case "Submarine":
-      temp = 3;
+    case typesOfShip.submarine.name:
+      temp = typesOfShip.submarine.size;
       break;
-    case "Destroyer":
-      temp = 3;
+    case typesOfShip.destroyer.name:
+      temp = typesOfShip.destroyer.size;
       break;
-    case "Patrol Boat":
-      temp = 2;
+    case typesOfShip.patrolBoat.name:
+      temp = typesOfShip.patrolBoat.size;
   }
   if (ship.locations[0][0] === ship.locations[1][0]) {
     y1 = 1;
@@ -122,17 +168,6 @@ function ship2Grid(ship) {
     "shipType": ship.type.toLowerCase(),
     "shipClass": shipClass
   };
-}
-
-/*********************************************************
- ** muestra los barcos en la grilla
- *********************************************************/
-function printShips() {
-  gameJson.ships.map(function (ship) {
-    ship = ship2Grid(ship);
-    shipGrid.addWidget($('<div id="' + ship.shipType + '"><div class="grid-stack-item-content ' + ship.shipClass + '"></div><div/>'),
-      ship.x0, ship.y0, ship.x1, ship.y1);
-  });
 }
 
 /*********************************************************
@@ -180,12 +215,40 @@ function printSalvoes() {
  ** Función de log out
  *********************************************************/
 function playerSignOut() {
-	$.post("/api/logout")
-		.done(function () {
-			window.location.replace("/web/games.html");
-			console.log("logged out");
-		})
+  $.post("/api/logout")
+    .done(function () {
+      window.location.replace("/web/games.html");
+      console.log("logged out");
+    })
 }
+
+/*********************************************************
+ ** Función de envía los barcos al backend para su creación
+ ** Recibe el id del game player y un array de barcos de la forma:
+ ** {"shipType": "...","shipLocation": ["XX", ..]}
+ *********************************************************/
+function createShips(gamePlayerId, shipsData) {
+  $.post({
+      url: "/api/games/players/" + gamePlayerId + "/ships",
+      data: JSON.stringify(shipsData),
+      dataType: "text",
+      contentType: "application/json"
+    })
+    .done(function (xhr) {
+      console.log(JSON.parse(xhr).created);
+    // Busco los datos del backend y agrego los barcos a la grilla
+      dataFetch().then(function () {
+        printShips(); // Imprimo los barcos
+      }).catch(function (error) {
+        // called when an error occurs anywhere in the chain
+        console.log("Request failed: " + error);
+      });
+    })
+    .fail(function (xhr) {
+      console.log(JSON.parse(xhr.responseText));
+    })
+}
+
 
 // Grid --------------------------------------------------------------------------------------------------------
 
@@ -209,7 +272,7 @@ const loadGrid = function () {
     //allows the widget to occupy more than one column
     disableOneColumnMode: true,
     //false allows widget dragging, true denies it
-    staticGrid: true,
+    staticGrid: false,
     //activates animations
     animate: true
   }
