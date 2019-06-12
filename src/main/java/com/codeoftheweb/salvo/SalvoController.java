@@ -136,6 +136,30 @@ public class SalvoController {
     return messageResponse;
   }
 
+  @RequestMapping(value = "/games/players/{gamePlayerId}/salvos", method = RequestMethod.POST)
+  public ResponseEntity<Map<String, Object>> salvosPlacement(@PathVariable Long gamePlayerId, @RequestBody Set<Salvo> salvos,
+                                                           Authentication authentication) {
+    ResponseEntity messageResponse;
+    if (isGuest(authentication)) {
+      messageResponse = new ResponseEntity<>(makeMap("unauthorized", "You must be logged"), HttpStatus.UNAUTHORIZED);
+    } else {
+      GamePlayer gamePlayer = gamePlayerRepository.findById(gamePlayerId).orElse(null);
+      if (gamePlayer == null) {
+        messageResponse = new ResponseEntity<>(makeMap("unauthorized", "The game does not exist"), HttpStatus.UNAUTHORIZED);
+      } else {
+        Player player = playerRepository.findByUserName(authentication.getName());
+        if (gamePlayer.getPlayer().getId() != player.getId()) {
+          messageResponse = new ResponseEntity<>(makeMap("unauthorized", "This is not your game"), HttpStatus.UNAUTHORIZED);
+        } else {
+          salvos.stream().forEach(gamePlayer::addSalvo);
+          gamePlayerRepository.save(gamePlayer);
+          messageResponse = new ResponseEntity<>(makeMap("created", "The salvoes have been placed"), HttpStatus.CREATED);
+        }
+      }
+    }
+    return messageResponse;
+  }
+
   // Crea y devuelve un map con los parámetros indicados
   private Map<String, Object> makeMap(String key, Object value) {
     Map<String, Object> map = new HashMap<>();

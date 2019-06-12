@@ -97,7 +97,20 @@
 	background-color: white;
 }
 
+#finish-placing-button {
+	text-align: center;
+}
+.finish-placing-button {
+	margin: 10px;
+	border-radius: 5px;
+	border: 2px solid black;
+	color: white;
+	background-color: black;
+}
 
+#alert-text {
+	color: red;
+}
 
 
 
