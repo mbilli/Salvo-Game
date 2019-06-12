@@ -215,6 +215,7 @@ function playerLogIn() {
 			})
 			.done(function () {
 				// recargo los datos e imprimo el html
+				eraseFields();
 				fetchFunction(url, init).then(function () {
 					htmlRender();
 				}).catch(function (error) {
@@ -228,7 +229,6 @@ function playerLogIn() {
 				console.log(xhr);
 			})
 	}
-	eraseFields();
 }
 
 /*********************************************************
@@ -255,6 +255,7 @@ function playerSignUp() {
 					})
 					.done(function () {
 						// recargo los datos e imprimo el html
+						eraseFields();
 						fetchFunction(url, init).then(function () {
 							htmlRender();
 						}).catch(function (error) {
@@ -269,7 +270,6 @@ function playerSignUp() {
 				console.log(xhr);
 			})
 	}
-	eraseFields();
 }
 
 /*********************************************************
