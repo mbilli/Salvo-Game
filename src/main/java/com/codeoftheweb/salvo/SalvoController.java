@@ -137,7 +137,7 @@ public class SalvoController {
   }
 
   @RequestMapping(value = "/games/players/{gamePlayerId}/salvos", method = RequestMethod.POST)
-  public ResponseEntity<Map<String, Object>> salvosPlacement(@PathVariable Long gamePlayerId, @RequestBody Set<Salvo> salvos,
+  public ResponseEntity<Map<String, Object>> salvosPlacement(@PathVariable Long gamePlayerId, @RequestBody Salvo salvo,
                                                            Authentication authentication) {
     ResponseEntity messageResponse;
     if (isGuest(authentication)) {
@@ -150,8 +150,10 @@ public class SalvoController {
         Player player = playerRepository.findByUserName(authentication.getName());
         if (gamePlayer.getPlayer().getId() != player.getId()) {
           messageResponse = new ResponseEntity<>(makeMap("unauthorized", "This is not your game"), HttpStatus.UNAUTHORIZED);
+        } else if (gamePlayer.getSalvoes().size() + 1 != salvo.getTurnNumber()) {
+          messageResponse = new ResponseEntity<>(makeMap("forbidden", "Wrong turn for salvo"), HttpStatus.FORBIDDEN);
         } else {
-          salvos.stream().forEach(gamePlayer::addSalvo);
+          gamePlayer.addSalvo(salvo);
           gamePlayerRepository.save(gamePlayer);
           messageResponse = new ResponseEntity<>(makeMap("created", "The salvoes have been placed"), HttpStatus.CREATED);
         }

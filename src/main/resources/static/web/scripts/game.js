@@ -2,6 +2,9 @@
 let gameJson;
 let player1 = {};
 let opponent1 = {};
+let cellsSelectedForFired = [];
+let NumberOfSalvoesToFire = 3;
+let NumberOfTurn = 3;
 const urlParams = new URLSearchParams(location.search);
 const gamePlayerParam = urlParams.get('gp');
 const typesOfShip = {
@@ -47,6 +50,10 @@ var init = {
 var playersId = document.getElementById("players");
 var logOutPanel = document.getElementById("logout-panel");
 var finishPlacingButton = document.getElementById("finish-placing-button");
+var finishSalvoesButton = document.getElementById("finish-salvoes-button");
+var gridShipsOpponent = document.getElementById("grid-ships-opponent");
+var salvoCells = gridShipsOpponent.getElementsByClassName("salvo-cell");
+var salvoesText = document.getElementById("salvoes-text");
 
 
 // Cargo la grilla, traigo los datos del backend e imprimo todo
@@ -65,9 +72,9 @@ $(() => {
 		printSalvoes(); // Imprimo los disparos
 	}).catch(function (error) {
 		// called when an error occurs anywhere in the chain
-		//alert("Request failed: " + error);
-		console.log("Request failed: " + error);
-		//window.location.replace("/web/games.html");
+		alert("Request failed: " + error);
+		//console.log("Request failed: " + error);
+		window.location.replace("/web/games.html");
 	});
 })
 
@@ -309,7 +316,6 @@ function ship2Grid(ship) {
  *********************************************************/
 function printSalvoes() {
 	let x0, y0, cellId, cellEl;
-
 	gameJson.salvoes.map(function (salvoesByTurn) {
 		if (salvoesByTurn.playerId === player1.id) {
 			salvoesByTurn.locations.map(function (salvo) {
@@ -322,7 +328,7 @@ function printSalvoes() {
 				}
 				cellId = "op-" + cellId; // le doy el formato op-xx
 				cellEl = document.getElementById(cellId); // busco el elemento
-				cellEl.classList.add("salvoes-fired"); // le asigno la clase
+				cellEl.classList.add("salvo-fired"); // le asigno la clase
 				cellEl.innerHTML = "<span>" + salvoesByTurn.turn + "</span>"; // le agrego el turno a la celda
 			});
 		} else if (salvoesByTurn.playerId === opponent1.id) {
@@ -337,7 +343,7 @@ function printSalvoes() {
 				cellId = "pl-" + cellId; // le doy el formato pl-xx
 				cellEl = document.getElementById(cellId); // busco el elemento
 				if (cellEl.classList.contains("busy-cell")) {
-					cellEl.classList.add("salvoes-received"); // le asigno la clase
+					cellEl.classList.add("salvo-received"); // le asigno la clase
 					cellEl.innerHTML = "<span>" + salvoesByTurn.turn + "</span>"; // le agrego el turno a la celda
 				}
 			});
@@ -345,6 +351,112 @@ function printSalvoes() {
 	});
 }
 
+/*********************************************************
+ ** Empieza la selección de salvoes para disparar
+ *********************************************************/
+function startSelectingSalvoes() {
+	salvoCells = Array.from(salvoCells);
+	salvoCells.forEach(function (cell, index) {
+		// Reviso que no se haya disparado en esa celda en turnos anteriores
+		if (!cell.classList.contains("salvo-fired")) {
+			// le asigno a las celdas la clase para hover (amarillo)
+			cell.classList.add("salvo-for-select");
+			// Agrego un listener para cambiar la clase de la celda que se presiona (verde)
+			// y para volver al estado anterior si se presiona de nuevo
+			cell.addEventListener("click", function () {
+				if (cell.classList.contains("salvo-for-select") && cellsSelectedForFired.length < NumberOfSalvoesToFire) {
+					cell.classList.remove("salvo-for-select");
+					cell.classList.add("salvo-selected");
+					cellsSelectedForFired.push(index);
+					console.log(cellsSelectedForFired);
+					// Indico los salvos que faltan para disparar
+					howManySalvoes();
+				} else if (cell.classList.contains("salvo-selected")) {
+					cell.classList.remove("salvo-selected");
+					cell.classList.add("salvo-for-select");
+					cellsSelectedForFired.splice(cellsSelectedForFired.indexOf(index), 1);
+					console.log(cellsSelectedForFired);
+					// Indico los salvos que faltan para disparar
+					howManySalvoes();
+				}
+			});
+		}
+	});
+	// Agrego botón para que finalize la ubicación
+	finishSalvoesButton.innerHTML = '<button onclick="finishSelectingSalvoes()" class="finish-salvoes-button">Fire the Salvoes</button>';
+	howManySalvoes();
+}
+// Función de soporte que indica cuantos salvoes faltan para disparar
+function howManySalvoes() {
+	if ((NumberOfSalvoesToFire - cellsSelectedForFired.length) === 0) {
+		salvoesText.innerHTML = "You can FIRE!!!";
+	} else if ((NumberOfSalvoesToFire - cellsSelectedForFired.length) === 1) {
+		salvoesText.innerHTML = "You should select 1 more salvo";
+	} else {
+		salvoesText.innerHTML = "You should select " + (NumberOfSalvoesToFire - cellsSelectedForFired.length) + " more salvoes";
+	}
+}
+
+/*********************************************************
+ ** Termina la selección de salvoes para disparar
+ *********************************************************/
+function finishSelectingSalvoes() {
+	let salvoesBackEnd = [];
+	// transformo las ubicaciones de los salvoes y agrego info para enviar al backend
+	salvoesBackEnd = salvoesCells2BackEnd(cellsSelectedForFired);
+	// Envío la posición al backend
+	saveSalvoes(gamePlayerParam, salvoesBackEnd).then(function () {
+		// Una vez que los salvoes se crearon en el backend
+		// Saco botón para que finalize la ubicación
+		finishSalvoesButton.innerHTML = '';
+		salvoesText.innerHTML = '';
+		// Recorro las celdas para ...
+		salvoCells.forEach(function (cell, index) {
+			if (!cell.classList.contains("salvo-fired")) {
+				// ... remover las clase
+				cell.classList.remove("salvo-for-select");
+				cell.classList.remove("salvo-selected");
+				// ... sacar los listener
+				// ?????????????????
+			}
+		});
+		// Limpio los salvos que se seleccionaron
+		cellsSelectedForFired = [];
+	}).catch(function (xhr) {
+		document.getElementById("alert-text").innerHTML = JSON.parse(xhr.responseText).forbidden;
+	});
+}
+
+/*********************************************************
+ ** Función que prepara los salvoes para enviar al backend
+ *********************************************************/
+function salvoesCells2BackEnd(salvoesCells) {
+	let salvoesBackEnd = {},
+		x0, y0, locations = [];
+	salvoesCells.forEach(function (salvoCell) {
+		//Tomo el valor de x e y
+		if (salvoCell > 9) {
+			y0 = Math.floor(salvoCell / 10);
+		} else {
+			y0 = 0;
+		}
+		x0 = salvoCell - y0 * 10 + 1;
+		// Transformo y0 en letra
+		y0 = yGridLetters[y0];
+		// guardo en locations, las posiciones
+		locations.push([y0, x0].join(""));
+	});
+	// Armo el json para enviar
+	salvoesBackEnd = {
+		"turnNumber": NumberOfTurn,
+		"salvoLocation": locations
+	};
+	return salvoesBackEnd;
+}
+
+/******************************************************************************************************************
+ ** Funciones que intercambian con el Backend
+ ******************************************************************************************************************/
 /*********************************************************
  ** Función de log out
  *********************************************************/
@@ -378,10 +490,33 @@ function createShips(gamePlayerId, shipsData) {
 		})
 }
 
+/*********************************************************
+ ** Función que envía los salvoes al backend para guardar
+ ** Recibe el id del game player y un json de la forma:
+ ** {"turnNumber": "...","salvoLocation": ["XX", ..]}
+ *********************************************************/
+function saveSalvoes(gamePlayerId, salvoesData) {
+	return $.post({
+			url: "/api/games/players/" + gamePlayerId + "/salvos",
+			data: JSON.stringify(salvoesData),
+			dataType: "text",
+			contentType: "application/json"
+		})
+		.done(function (xhr) {
+			console.log(JSON.parse(xhr).created);
+			return xhr.status;
+		})
+		.fail(function (xhr) {
+			console.log(JSON.parse(xhr.responseText));
+			return xhr.status;
+		})
+}
 
-// Grid --------------------------------------------------------------------------------------------------------
-
-
+/***************************************************************************************************************
+ ** Grid --------------------------------------------------------------------------------------------------------
+ **all the functionalities are explained in the gridstack github
+ **https://github.com/gridstack/gridstack.js/tree/develop/doc
+ ***************************************************************************************************************/
 
 //main function that shoots the gridstack.js framework and load the grid with the ships
 const loadGrid = function () {
@@ -414,16 +549,16 @@ const loadGrid = function () {
 	createGrid("pl", 11, $(".grid-ships-player"))
 	createGrid("op", 11, $(".grid-ships-opponent"))
 
-
-	listenBusyCells()
+	listenBusyCells();
 	$('.grid-stack').on('change', listenBusyCells)
 
-
-	//all the functionalities are explained in the gridstack github
-	//https://github.com/gridstack/gridstack.js/tree/develop/doc
-
+	// Agrego la clase salvo-cell a todas las celdas de los salvos
+	for (let i = 0; i < 10; i++) {
+		for (let j = 0; j < 10; j++) {
+			$(`#op-${j}${i}`).addClass('salvo-cell')
+		}
+	}
 }
-
 
 //creates the grid structure
 const createGrid = function (idName, size, element) {
@@ -500,7 +635,6 @@ const rotateShips = function (shipType, cells, addEvent) {
 		$(`#${shipType}`).off("click");
 	}
 }
-
 
 //loops over all the grid cells, verifying if they are empty or busy
 const listenBusyCells = function () {

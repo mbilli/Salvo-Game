@@ -2,10 +2,24 @@
   text-align: center;
 }
 
-.salvoes-fired,
-.salvoes-received {
+#alert-text, #salvoes-text {
+	color: red;
+}
+
+.salvo-fired,
+.salvo-received {
   background-color: rgba(255, 0, 0, 0.4) !important;
   z-index: 9999;
+}
+
+.salvo-for-select:hover{
+	background-color: yellow;
+	opacity: 0.4;
+}
+
+.salvo-selected {
+	background-color: green;
+	opacity: 0.8;
 }
 
 #login-form,
@@ -97,10 +111,10 @@
 	background-color: white;
 }
 
-#finish-placing-button {
+#finish-placing-button, #finish-salvoes-button {
 	text-align: center;
 }
-.finish-placing-button {
+.finish-placing-button, .finish-salvoes-button {
 	margin: 10px;
 	border-radius: 5px;
 	border: 2px solid black;
@@ -108,9 +122,7 @@
 	background-color: black;
 }
 
-#alert-text {
-	color: red;
-}
+
 
 
 
