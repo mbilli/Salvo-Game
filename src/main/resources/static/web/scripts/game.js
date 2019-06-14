@@ -4,7 +4,7 @@ let player1 = {};
 let opponent1 = {};
 let cellsSelectedForFired = [];
 let NumberOfSalvoesToFire = 3;
-let NumberOfTurn = 3;
+let NumberOfTurn;
 const urlParams = new URLSearchParams(location.search);
 const gamePlayerParam = urlParams.get('gp');
 const typesOfShip = {
@@ -69,7 +69,8 @@ $(() => {
 		} else {
 			printShips(gameJson.ships); // Imprimo los barcos
 		}
-		printSalvoes(); // Imprimo los disparos
+		printSalvoes(gameJson.salvoes); // Imprimo los disparos
+        startSelectingSalvoes() // solo temporal para prueba -------------------------------
 	}).catch(function (error) {
 		// called when an error occurs anywhere in the chain
 		alert("Request failed: " + error);
@@ -79,22 +80,6 @@ $(() => {
 })
 
 // Funciones
-/*********************************************************
- ** Traigo los datos y los asigno a gameJson
- *********************************************************/
-function dataFetch() {
-	return fetch(url, init).then(function (response) {
-		if (response.ok) {
-			return response.json();
-		}
-		// signal a server error to the chain
-		throw new Error(response.statusText);
-	}).then(function (myJson) {
-		// do something with the JSON
-		gameJson = myJson;
-	});
-}
-
 /*********************************************************
  ** Asigno quien es el jugador y quien el oponente
  *********************************************************/
@@ -314,14 +299,14 @@ function ship2Grid(ship) {
 /*********************************************************
  ** muestra los salvos en la grilla de disparo y en la de los barcos
  *********************************************************/
-function printSalvoes() {
+function printSalvoes(salvoesForPrint) {
 	let x0, y0, cellId, cellEl;
-	gameJson.salvoes.map(function (salvoesByTurn) {
+	salvoesForPrint.map(function (salvoesByTurn) {
 		if (salvoesByTurn.playerId === player1.id) {
 			salvoesByTurn.locations.map(function (salvo) {
 				// Asigno x e y
 				y0 = yGridLetters.indexOf(salvo[0]);
-				x0 = parseInt(salvo[1]) - 1;
+				x0 = parseInt(salvo.slice(1)) - 1;
 				cellId = x0 + (y0 * cellSize.width); // calculo el Id de la celda
 				if (cellId < 10) {
 					cellId = "0" + cellId; // si es menor que 10, uso formato 0X
@@ -363,7 +348,7 @@ function startSelectingSalvoes() {
 			cell.classList.add("salvo-for-select");
 			// Agrego un listener para cambiar la clase de la celda que se presiona (verde)
 			// y para volver al estado anterior si se presiona de nuevo
-			cell.addEventListener("click", function () {
+			$(cell).click(function () {
 				if (cell.classList.contains("salvo-for-select") && cellsSelectedForFired.length < NumberOfSalvoesToFire) {
 					cell.classList.remove("salvo-for-select");
 					cell.classList.add("salvo-selected");
@@ -416,12 +401,19 @@ function finishSelectingSalvoes() {
 				// ... remover las clase
 				cell.classList.remove("salvo-for-select");
 				cell.classList.remove("salvo-selected");
-				// ... sacar los listener
-				// ?????????????????
+                // ... remover los listener
+                $(cell).off("click");
 			}
 		});
 		// Limpio los salvos que se seleccionaron
 		cellsSelectedForFired = [];
+        // Busco los datos del backend y agrego los barcos a la grilla
+		dataFetch().then(function () {
+			printSalvoes(gameJson.salvoes); // Imprimo los salvoes
+		}).catch(function (error) {
+			// called when an error occurs anywhere in the chain
+			console.log("Request failed: " + error);
+		});
 	}).catch(function (xhr) {
 		document.getElementById("alert-text").innerHTML = JSON.parse(xhr.responseText).forbidden;
 	});
@@ -457,6 +449,23 @@ function salvoesCells2BackEnd(salvoesCells) {
 /******************************************************************************************************************
  ** Funciones que intercambian con el Backend
  ******************************************************************************************************************/
+/*********************************************************
+ ** Traigo los datos y los asigno a gameJson
+ *********************************************************/
+function dataFetch() {
+	return fetch(url, init).then(function (response) {
+		if (response.ok) {
+			return response.json();
+		}
+		// signal a server error to the chain
+		throw new Error(response.statusText);
+	}).then(function (myJson) {
+		// do something with the JSON
+		gameJson = myJson;
+        NumberOfTurn = gameJson.nextTurn;
+	});
+}
+
 /*********************************************************
  ** Función de log out
  *********************************************************/

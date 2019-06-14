@@ -129,6 +129,7 @@ public class GamePlayer {
     dto.put("ships", this.getShips().stream().map(Ship::makeDTO));
     dto.put("salvoes", this.game.getGamePlayers().stream()
             .flatMap(gamePlayer -> gamePlayer.getSalvoes().stream().map(Salvo::makeDTO)));
+    dto.put("nextTurn", this.getSalvoes().size() + 1);
     return dto;
   }
 }

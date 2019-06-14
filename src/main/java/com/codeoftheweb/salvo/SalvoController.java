@@ -153,7 +153,7 @@ public class SalvoController {
         } else if (gamePlayer.getSalvoes().size() + 1 != salvo.getTurnNumber()) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "Wrong turn for salvo"), HttpStatus.FORBIDDEN);
         } else {
-          gamePlayer.addSalvo(salvo); j
+          gamePlayer.addSalvo(salvo);
           gamePlayerRepository.save(gamePlayer);
           messageResponse = new ResponseEntity<>(makeMap("created", "The salvoes have been placed"), HttpStatus.CREATED);
         }
