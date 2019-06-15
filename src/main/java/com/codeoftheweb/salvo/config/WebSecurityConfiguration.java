@@ -1,7 +1,7 @@
 package com.codeoftheweb.salvo.config;
 
-import com.codeoftheweb.salvo.Player;
-import com.codeoftheweb.salvo.PlayerRepository;
+import com.codeoftheweb.salvo.model.Player;
+import com.codeoftheweb.salvo.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
