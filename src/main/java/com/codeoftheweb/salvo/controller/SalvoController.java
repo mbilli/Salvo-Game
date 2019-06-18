@@ -153,9 +153,13 @@ public class SalvoController {
         Player player = playerRepository.findByUserName(authentication.getName());
         if (gamePlayer.getPlayer().getId() != player.getId()) {
           messageResponse = new ResponseEntity<>(makeMap("unauthorized", "This is not your game"), HttpStatus.UNAUTHORIZED);
+        } else if (gamePlayer.getShips().size() == 0) {
+          messageResponse = new ResponseEntity<>(makeMap("forbidden", "Ships must be place"), HttpStatus.FORBIDDEN);
         } else if (gamePlayer.getSalvoes().size() + 1 != salvo.getTurnNumber()) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "Wrong turn for salvo"), HttpStatus.FORBIDDEN);
-        } else {
+        } else if (salvo.getSalvoLocation().size() > 5) {
+          messageResponse = new ResponseEntity<>(makeMap("forbidden", "Wrong number of salvoes fired"), HttpStatus.FORBIDDEN);
+        }else {
           gamePlayer.addSalvo(salvo);
           gamePlayerRepository.save(gamePlayer);
           messageResponse = new ResponseEntity<>(makeMap("created", "The salvoes have been placed"), HttpStatus.CREATED);

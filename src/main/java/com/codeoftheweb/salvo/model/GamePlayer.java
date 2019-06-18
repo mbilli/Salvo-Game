@@ -4,10 +4,8 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 public class GamePlayer {
@@ -108,6 +106,16 @@ public class GamePlayer {
             .findFirst().orElse(null);
   }
 
+  // Dado una lista de salvos y una lista de ships, devuelve los salvos que impactaron en los barcos
+  public Map<String, Object> findHitsOnShips(Set<Salvo> salvoes, Set<Ship> ships){
+    List<String> hitsLocation;
+    Map<String, Object> mapResponse = new LinkedHashMap<String, Object>();
+    hitsLocation = ships.stream().flatMap(ship->salvoes.stream().flatMap(salvo->salvo.getSalvoLocation()
+            .stream().filter(salvoLocation->ship.getShipLocation().contains(salvoLocation)))).collect(Collectors.toList());
+    mapResponse.put("hitsLocations", hitsLocation);
+    return mapResponse;
+  }
+
   // GamePlayer DTO for /games
   public Map<String, Object> makeDTO() {
     Map<String, Object> dto = new LinkedHashMap<String, Object>();
@@ -130,6 +138,11 @@ public class GamePlayer {
     dto.put("salvoes", this.game.getGamePlayers().stream()
             .flatMap(gamePlayer -> gamePlayer.getSalvoes().stream().map(Salvo::makeDTO)));
     dto.put("nextTurn", this.getSalvoes().size() + 1);
+    GamePlayer opponentGP;
+    opponentGP = this.getGame().getGamePlayers().stream().filter(gp->gp.getId()!=this.getId()).findFirst().orElse(null);
+    if (opponentGP != null){
+      dto.put("hits", this.findHitsOnShips(this.getSalvoes(), opponentGP.getShips()));
+    }
     return dto;
   }
 }
