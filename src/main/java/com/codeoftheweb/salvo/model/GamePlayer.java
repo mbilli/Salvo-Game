@@ -106,14 +106,11 @@ public class GamePlayer {
             .findFirst().orElse(null);
   }
 
-  // Dado una lista de salvos y una lista de ships, devuelve los salvos que impactaron en los barcos
-  public Map<String, Object> findHitsOnShips(Set<Salvo> salvoes, Set<Ship> ships){
-    List<String> hitsLocation;
-    Map<String, Object> mapResponse = new LinkedHashMap<String, Object>();
-    hitsLocation = ships.stream().flatMap(ship->salvoes.stream().flatMap(salvo->salvo.getSalvoLocation()
-            .stream().filter(salvoLocation->ship.getShipLocation().contains(salvoLocation)))).collect(Collectors.toList());
-    mapResponse.put("hitsLocations", hitsLocation);
-    return mapResponse;
+  // Methods
+  // Dado una lista de barcos y salvos, devuelve los barcos hundidos
+  public List<Ship> isSink(Set<Ship> ships, Set<Salvo> salvoes){
+    List<String> allShots = salvoes.stream().flatMap(salvo -> salvo.getSalvoLocation().stream()).collect(Collectors.toList());
+    return ships.stream().filter(ship -> allShots.containsAll(ship.getShipLocation())).collect(Collectors.toList());
   }
 
   // GamePlayer DTO for /games
@@ -141,7 +138,8 @@ public class GamePlayer {
     GamePlayer opponentGP;
     opponentGP = this.getGame().getGamePlayers().stream().filter(gp->gp.getId()!=this.getId()).findFirst().orElse(null);
     if (opponentGP != null){
-      dto.put("hits", this.findHitsOnShips(this.getSalvoes(), opponentGP.getShips()));
+      dto.put("hits", this.salvoes.stream().map(salvo -> salvo.findHitsOnShips(opponentGP.getShips())));
+      dto.put("sinkShips", this.isSink(opponentGP.getShips(), this.getSalvoes()).stream().map(Ship::makeDTO));
     }
     return dto;
   }

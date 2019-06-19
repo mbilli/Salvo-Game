@@ -12,13 +12,17 @@
   z-index: 9999;
 }
 
+.salvo-hit {
+	background-color: rgba(0, 255, 0, 0.4) !important;
+}
+
 .salvo-for-select:hover{
 	background-color: yellow;
 	opacity: 0.4;
 }
 
 .salvo-selected {
-	background-color: green;
+	background-color: greenyellow;
 	opacity: 0.8;
 }
 
@@ -230,6 +234,10 @@
 .grid-row {
   display: flex;
   flex-direction: row;
+}
+
+#grid-ships-opponent .grid-row {
+  z-index: 1;
 }
 
 .grid-cell {

@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 public class Salvo {
@@ -65,6 +63,19 @@ public class Salvo {
 
   public void setGamePlayer(GamePlayer gamePlayer) {
     this.gamePlayer = gamePlayer;
+  }
+
+  // Methods
+  // Dado una lista de barcos, devuelve los salvos que impactaron en los barcos
+  public Object findHitsOnShips(Set<Ship> ships){
+    List<String> hitsLocation;
+    Map<String, Object> mapResponse = new LinkedHashMap<String, Object>();
+    hitsLocation = this.getSalvoLocation().stream().flatMap(salvoLocation->ships.stream()
+            .flatMap(ship -> ship.getShipLocation().stream().filter(shipLocation->shipLocation.contains(salvoLocation))))
+            .collect(Collectors.toList());
+    mapResponse.put("turn", this.turnNumber);
+    mapResponse.put("hitsLocations", hitsLocation);
+    return mapResponse;
   }
 
   //Salvo dto

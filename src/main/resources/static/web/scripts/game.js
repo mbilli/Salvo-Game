@@ -69,13 +69,16 @@ $(() => {
 		} else {
 			printShips(gameJson.ships); // Imprimo los barcos
 		}
-		printSalvoes(gameJson.salvoes); // Imprimo los disparos
-        startSelectingSalvoes() // solo temporal para prueba -------------------------------
+			// Si hay disparos, los imprimo
+		if (gameJson.salvoes.length > 0) {
+			printSalvoes(gameJson.salvoes);
+		}
+		startSelectingSalvoes() // solo temporal para prueba -------------------------------
 	}).catch(function (error) {
 		// called when an error occurs anywhere in the chain
-		alert("Request failed: " + error);
-		//console.log("Request failed: " + error);
-		window.location.replace("/web/games.html");
+		//alert("Request failed: " + error);
+		console.log("Request failed: " + error);
+		//window.location.replace("/web/games.html");
 	});
 })
 
@@ -251,6 +254,20 @@ function printShips(shipsJson) {
 }
 
 /*********************************************************
+ ** muestra los barcos hundidos del enemigo
+ *********************************************************/
+function printSinkShips(shipsJson) {
+	// Borro los barcos que hay
+	salvoGrid.removeAll($('.grid-stack'))
+	// Agrego los nuevos
+	shipsJson.map(function (ship) {
+		ship = ship2Grid(ship);
+		salvoGrid.addWidget($('<div id="' + ship.shipType + '"><div class="grid-stack-item-content ' + ship.shipClass + '"></div><div/>'),
+			ship.x0, ship.y0, ship.x1, ship.y1);
+	});
+}
+
+/*********************************************************
  ** convierto los datos del barco a un formato simple de utilizar en la grilla
  *********************************************************/
 function ship2Grid(ship) {
@@ -300,8 +317,14 @@ function ship2Grid(ship) {
  ** muestra los salvos en la grilla de disparo y en la de los barcos
  *********************************************************/
 function printSalvoes(salvoesForPrint) {
+	printSinkShips(gameJson.sinkShips)
 	let x0, y0, cellId, cellEl;
+	let hits = [];
+	// Armo un array de los hits a los barcos enemigos
+	gameJson.hits.forEach(hitByTurn => hitByTurn.hitsLocations.forEach(hit => hits.push(hit)));
+	console.log(hits);
 	salvoesForPrint.map(function (salvoesByTurn) {
+		// Si disparo el jugador, se muestra en la grilla de disparo
 		if (salvoesByTurn.playerId === player1.id) {
 			salvoesByTurn.locations.map(function (salvo) {
 				// Asigno x e y
@@ -313,9 +336,14 @@ function printSalvoes(salvoesForPrint) {
 				}
 				cellId = "op-" + cellId; // le doy el formato op-xx
 				cellEl = document.getElementById(cellId); // busco el elemento
-				cellEl.classList.add("salvo-fired"); // le asigno la clase
+				// Reviso si el disparo aceto en un barco enemigo
+				if (hits.indexOf(salvo) != -1) {
+					cellEl.classList.add("salvo-hit"); // le asigno la clase de acierto
+				}
+				cellEl.classList.add("salvo-fired"); // le asigno la clase de disparo
 				cellEl.innerHTML = "<span>" + salvoesByTurn.turn + "</span>"; // le agrego el turno a la celda
 			});
+			// Si disparo el oponente, se muestra en la grilla de barcos
 		} else if (salvoesByTurn.playerId === opponent1.id) {
 			salvoesByTurn.locations.map(function (salvo) {
 				// Asigno x e y
@@ -401,13 +429,13 @@ function finishSelectingSalvoes() {
 				// ... remover las clase
 				cell.classList.remove("salvo-for-select");
 				cell.classList.remove("salvo-selected");
-                // ... remover los listener
-                $(cell).off("click");
+				// ... remover los listener
+				$(cell).off("click");
 			}
 		});
 		// Limpio los salvos que se seleccionaron
 		cellsSelectedForFired = [];
-        // Busco los datos del backend y agrego los barcos a la grilla
+		// Busco los datos del backend y agrego los barcos a la grilla
 		dataFetch().then(function () {
 			printSalvoes(gameJson.salvoes); // Imprimo los salvoes
 		}).catch(function (error) {
@@ -462,7 +490,7 @@ function dataFetch() {
 	}).then(function (myJson) {
 		// do something with the JSON
 		gameJson = myJson;
-        NumberOfTurn = gameJson.nextTurn;
+		NumberOfTurn = gameJson.nextTurn;
 	});
 }
 
