@@ -46,6 +46,11 @@
   display: none;
 }
 
+#salvo-history {
+	text-align: center;
+	margin-top: 10px;
+}
+
 /* animación de carga de página */
 #reload-body img {
   width: 50px;

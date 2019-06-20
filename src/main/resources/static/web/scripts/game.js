@@ -54,6 +54,7 @@ var finishSalvoesButton = document.getElementById("finish-salvoes-button");
 var gridShipsOpponent = document.getElementById("grid-ships-opponent");
 var salvoCells = gridShipsOpponent.getElementsByClassName("salvo-cell");
 var salvoesText = document.getElementById("salvoes-text");
+var salvoHistory = document.getElementById("salvo-history");
 
 
 // Cargo la grilla, traigo los datos del backend e imprimo todo
@@ -322,7 +323,6 @@ function printSalvoes(salvoesForPrint) {
 	let hits = [];
 	// Armo un array de los hits a los barcos enemigos
 	gameJson.hits.forEach(hitByTurn => hitByTurn.hitsLocations.forEach(hit => hits.push(hit)));
-	console.log(hits);
 	salvoesForPrint.map(function (salvoesByTurn) {
 		// Si disparo el jugador, se muestra en la grilla de disparo
 		if (salvoesByTurn.playerId === player1.id) {
@@ -362,6 +362,23 @@ function printSalvoes(salvoesForPrint) {
 			});
 		}
 	});
+}
+
+/*********************************************************
+ ** Muestra que barcos faltan destruir y la historia de tiros
+ *********************************************************/
+function showSalvoHistory() {
+	let shipsUnsink = [];
+	for (typeOfShip in typesOfShip) {
+		if (!gameJson.sinkShips.some(ship => {return ship.type == typesOfShip[typeOfShip].name})) {
+			shipsUnsink.push(typesOfShip[typeOfShip]);
+		}
+	}
+	salvoHistory.innerHTML = "<h6>You have to destroy:</h6><ul>";
+	shipsUnsink.forEach(shipUnsink => {
+		salvoHistory.innerHTML += "<li>Ship: " + shipUnsink.name + " - Size: " + shipUnsink.size + "</li>";
+	});
+	salvoHistory.innerHTML += "</ul>";
 }
 
 /*********************************************************
@@ -491,6 +508,7 @@ function dataFetch() {
 		// do something with the JSON
 		gameJson = myJson;
 		NumberOfTurn = gameJson.nextTurn;
+		showSalvoHistory();
 	});
 }
 
