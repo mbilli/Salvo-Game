@@ -90,7 +90,7 @@ public class GamePlayer {
     this.game = game;
   }
 
-  // methods
+  // Methods
   public void addShip(Ship ship) {
     ship.setGamePlayer(this);
     ships.add(ship);
@@ -106,11 +106,49 @@ public class GamePlayer {
             .findFirst().orElse(null);
   }
 
-  // Methods
   // Dado una lista de barcos y salvos, devuelve los barcos hundidos
   public List<Ship> isSink(Set<Ship> ships, Set<Salvo> salvoes){
     List<String> allShots = salvoes.stream().flatMap(salvo -> salvo.getSalvoLocation().stream()).collect(Collectors.toList());
     return ships.stream().filter(ship -> allShots.containsAll(ship.getShipLocation())).collect(Collectors.toList());
+  }
+
+  // Devuelve el estado de un gameplayer (ver GamePlayerState enum)
+  public GamePlayerState getGamePlayerState() {
+    GamePlayerState stateResponse;
+    GamePlayer opponentGP = this.getGame().getGamePlayers().stream().filter(gp->gp.getId()!=this.getId()).findFirst()
+            .orElse(null);
+    if (opponentGP == null) {
+      stateResponse = GamePlayerState.WAIT_OPPONENT_JOIN;
+    } else if(this.getShips().size() < 5) {
+      stateResponse = GamePlayerState.PLACE_SHIPS;
+    } else if(opponentGP.getShips().size() < 5) {
+      stateResponse = GamePlayerState.WAIT_OPPONENT_SHIPS;
+    } else {
+      int sunkOpponentNumber = isSink(opponentGP.getShips(), this.getSalvoes()).size();
+      int sunkPlayerNumber = isSink(this.getShips(), opponentGP.getSalvoes()).size();
+      int opponentTurn = opponentGP.getSalvoes().size();
+      int playerTurn = this.getSalvoes().size();
+      // Si se hundieron todos los barcos enemigos pero no los mios y el turno del oponente es mayor o igual al mio
+      // Gano el juego
+      if(sunkOpponentNumber >= 5 && sunkPlayerNumber < 5 && opponentTurn >= playerTurn) {
+        stateResponse = GamePlayerState.GAME_OVER_WON;
+        // Si no se hundieron todos los barcos enemigos pero si los mios y mi turno es mayor o igual al del oponente
+        // Pierdo el juego
+      } else if(sunkOpponentNumber < 5 && sunkPlayerNumber >= 5 && opponentTurn <= playerTurn) {
+        stateResponse = GamePlayerState.GAME_OVER_LOST;
+        // Si se hundieron todos los barcos enemigos y los mios
+        // Empato el juego
+      } else if(sunkOpponentNumber == 5 && sunkPlayerNumber == 5) {
+        stateResponse = GamePlayerState.GAME_OVER_TIED;
+      } else if (this.getSalvoes().size() <= opponentGP.getSalvoes().size()) {
+        stateResponse = GamePlayerState.ENTER_SALVO;
+      } else if (this.getSalvoes().size() > opponentGP.getSalvoes().size()) {
+        stateResponse = GamePlayerState.WAIT_OPPONENT_SALVO;
+      } else {
+        stateResponse = GamePlayerState.UNKNOWN;
+      }
+    }
+    return stateResponse;
   }
 
   // GamePlayer DTO for /games
@@ -141,6 +179,7 @@ public class GamePlayer {
       dto.put("hits", this.salvoes.stream().map(salvo -> salvo.findHitsOnShips(opponentGP.getShips())));
       dto.put("sinkShips", this.isSink(opponentGP.getShips(), this.getSalvoes()).stream().map(Ship::makeDTO));
     }
+    dto.put("gamePlayerSate", this.getGamePlayerState());
     return dto;
   }
 }

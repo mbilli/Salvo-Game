@@ -370,7 +370,9 @@ function printSalvoes(salvoesForPrint) {
 function showSalvoHistory() {
 	let shipsUnsink = [];
 	for (typeOfShip in typesOfShip) {
-		if (!gameJson.sinkShips.some(ship => {return ship.type == typesOfShip[typeOfShip].name})) {
+		if (!gameJson.sinkShips) {
+			shipsUnsink.push(typesOfShip[typeOfShip]);
+		} else if (!gameJson.sinkShips.some(ship => {return ship.type == typesOfShip[typeOfShip].name})) {
 			shipsUnsink.push(typesOfShip[typeOfShip]);
 		}
 	}
