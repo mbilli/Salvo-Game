@@ -2,6 +2,32 @@
   text-align: center;
 }
 
+#controls-console {
+	background-color: black;
+	color: green;
+	padding: 15px;
+	font-weight: bold; 
+}
+.title-control {
+	border: 1px solid green;
+	border-radius: 5px;
+	background-color: green;
+	color: black;
+	padding: 2px 5px;
+	margin: 0px 5px;
+	text-transform: uppercase;
+}
+.radar-image {
+	height: 50px;
+}
+.info-control {
+	color: white;
+	border-top: 2px solid green;
+	border-bottom: 2px solid green;
+	padding: 2px 5px;
+	border-radius: 5px;
+}
+
 #alert-text, #salvoes-text {
 	color: red;
 }

@@ -155,10 +155,16 @@ public class SalvoController {
           messageResponse = new ResponseEntity<>(makeMap("unauthorized", "This is not your game"), HttpStatus.UNAUTHORIZED);
         } else if (gamePlayer.getShips().size() == 0) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "Ships must be place"), HttpStatus.FORBIDDEN);
+        } else if (gamePlayer.getGamePlayerState() == GamePlayerState.GAME_OVER_LOST
+                || gamePlayer.getGamePlayerState() == GamePlayerState.GAME_OVER_WON
+                || gamePlayer.getGamePlayerState() == GamePlayerState.GAME_OVER_TIED) {
+          messageResponse = new ResponseEntity<>(makeMap("forbidden", "Game is over"), HttpStatus.FORBIDDEN);
         } else if (gamePlayer.getSalvoes().size() + 1 != salvo.getTurnNumber()) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "Wrong turn for salvo"), HttpStatus.FORBIDDEN);
         } else if (salvo.getSalvoLocation().size() > 5) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "Wrong number of salvoes fired"), HttpStatus.FORBIDDEN);
+        }  else if (gamePlayer.getGamePlayerState() != GamePlayerState.ENTER_SALVO) {
+          messageResponse = new ResponseEntity<>(makeMap("forbidden", "You can not fire at this moment"), HttpStatus.FORBIDDEN);
         } else {
           gamePlayer.addSalvo(salvo);
           gamePlayerRepository.save(gamePlayer);

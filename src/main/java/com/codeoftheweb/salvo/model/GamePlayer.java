@@ -119,9 +119,9 @@ public class GamePlayer {
             .orElse(null);
     if (opponentGP == null) {
       stateResponse = GamePlayerState.WAIT_OPPONENT_JOIN;
-    } else if(this.getShips().size() < 5) {
+    } else if(this.getShips().isEmpty()) {
       stateResponse = GamePlayerState.PLACE_SHIPS;
-    } else if(opponentGP.getShips().size() < 5) {
+    } else if(opponentGP.getShips().isEmpty()) {
       stateResponse = GamePlayerState.WAIT_OPPONENT_SHIPS;
     } else {
       int sunkOpponentNumber = isSink(opponentGP.getShips(), this.getSalvoes()).size();

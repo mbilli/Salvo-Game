@@ -5,6 +5,7 @@ let opponent1 = {};
 let cellsSelectedForFired = [];
 let NumberOfSalvoesToFire = 3;
 let NumberOfTurn;
+var timerId;
 const urlParams = new URLSearchParams(location.search);
 const gamePlayerParam = urlParams.get('gp');
 const typesOfShip = {
@@ -39,6 +40,17 @@ const cellSize = {
 	width: 10,
 	height: 10
 };
+const gameStateEnum = {
+	waitOpponentJoin: "WAIT_OPPONENT_JOIN",
+	placeShips: "PLACE_SHIPS",
+	waitOpponentShips: "WAIT_OPPONENT_SHIPS",
+	enterSalvo: "ENTER_SALVO",
+	waitOpponentSalvo: "WAIT_OPPONENT_SALVO",
+	gameOverWon: "GAME_OVER_WON",
+	gameOverLost: "GAME_OVER_LOST",
+	gamOverTied: "GAME_OVER_TIED",
+	unknown: "UNKNOWN"
+};
 // Defino header
 var url = '/api/game_view/' + gamePlayerParam;
 var init = {
@@ -48,6 +60,8 @@ var init = {
 };
 
 var playersId = document.getElementById("players");
+var gameStateHTML = document.getElementById("game-state");
+var gameTurnHTML = document.getElementById("game-turn");
 var logOutPanel = document.getElementById("logout-panel");
 var finishPlacingButton = document.getElementById("finish-placing-button");
 var finishSalvoesButton = document.getElementById("finish-salvoes-button");
@@ -55,6 +69,8 @@ var gridShipsOpponent = document.getElementById("grid-ships-opponent");
 var salvoCells = gridShipsOpponent.getElementsByClassName("salvo-cell");
 var salvoesText = document.getElementById("salvoes-text");
 var salvoHistory = document.getElementById("salvo-history");
+var reloadBody = document.getElementById("reload-body");
+var mainBody = document.getElementById("main-body");
 
 
 // Cargo la grilla, traigo los datos del backend e imprimo todo
@@ -70,20 +86,48 @@ $(() => {
 		} else {
 			printShips(gameJson.ships); // Imprimo los barcos
 		}
-			// Si hay disparos, los imprimo
+		// Si hay disparos, los imprimo
 		if (gameJson.salvoes.length > 0) {
 			printSalvoes(gameJson.salvoes);
 		}
-		startSelectingSalvoes() // solo temporal para prueba -------------------------------
+		// Muestro la página
+		htmlRender();
+		updateFromBackend();
 	}).catch(function (error) {
 		// called when an error occurs anywhere in the chain
-		//alert("Request failed: " + error);
+		alert("Request failed: " + error);
 		console.log("Request failed: " + error);
-		//window.location.replace("/web/games.html");
+		window.location.replace("/web/games.html");
 	});
 })
 
 // Funciones
+/*********************************************************
+ ** Establezco timer para comunicación con backend
+ *********************************************************/
+function updateFromBackend() {
+	timerId = setInterval(function () {
+		dataFetch().then(function (myJson) {
+			// Actualizo página
+			htmlRender();
+			if (gameJson.salvoes.length > 0) {
+				printSalvoes(gameJson.salvoes);
+			}
+			console.log("backend");
+		}).catch(function (error) {
+			// called when an error occurs anywhere in the chain
+			console.log("Request failed: " + error);
+		});
+	}, 1000);
+}
+
+/*********************************************************
+ ** Detengo timer para comunicación con backend
+ *********************************************************/
+function stopUpdateFromBackend() {
+	clearInterval(timerId);
+}
+
 /*********************************************************
  ** Asigno quien es el jugador y quien el oponente
  *********************************************************/
@@ -109,8 +153,55 @@ function printPlayers() {
 	}
 
 	// escribo en el dom
-	playersId.innerHTML += player1.username + " (you) vs ";
+	playersId.innerHTML = player1.username + " (you) vs ";
 	playersId.innerHTML += opponent1.username;
+}
+
+/*********************************************************
+ ** Render Functions
+ *********************************************************/
+function htmlRender() {
+	// Reviso el estado del juego
+	switch (gameJson.gamePlayerSate) {
+		case gameStateEnum.waitOpponentJoin:
+			gameStateHTML.innerHTML = "Waiting your opponent";
+			break;
+		case gameStateEnum.placeShips:
+			gameStateHTML.innerHTML = "Place your ships";
+			break;
+		case gameStateEnum.waitOpponentShips:
+			gameStateHTML.innerHTML = "Waiting opponent's ships";
+			break;
+		case gameStateEnum.enterSalvo:
+			gameStateHTML.innerHTML = "Enter your salvo";
+			startSelectingSalvoes();
+			break;
+		case gameStateEnum.waitOpponentSalvo:
+			gameStateHTML.innerHTML = "Waiting opponent's salvos";
+			break;
+		case gameStateEnum.gameOverWon:
+			gameStateHTML.innerHTML = "Game over: You won";
+			break;
+		case gameStateEnum.gameOverLost:
+			gameStateHTML.innerHTML = "Game over: You lost";
+			break;
+		case gameStateEnum.gamOverTied:
+			gameStateHTML.innerHTML = "Game over: Tied";
+			break;
+		case gameStateEnum.unknown:
+			gameStateHTML.innerHTML = "There have been some problems, probably is your fault!!!";
+	}
+	// Cargo el nombre del nuevo jugador
+	if(gameJson.gamePlayers.length == 2 && !opponent1.id){
+		assignPlayers();
+		printPlayers();
+	}
+
+	// saco el icono de cargando
+	reloadBody.style.display = "none";
+	reloadBody.innerHTML = "";
+	// muestro la página una vez que está todo en su lugar ;)
+	mainBody.style.visibility = "visible";
 }
 
 /*********************************************************
@@ -158,6 +249,7 @@ function finishPlacingShips() {
 		// Busco los datos del backend y agrego los barcos a la grilla
 		dataFetch().then(function () {
 			printShips(gameJson.ships); // Imprimo los barcos
+			htmlRender();
 		}).catch(function (error) {
 			// called when an error occurs anywhere in the chain
 			console.log("Request failed: " + error);
@@ -372,7 +464,9 @@ function showSalvoHistory() {
 	for (typeOfShip in typesOfShip) {
 		if (!gameJson.sinkShips) {
 			shipsUnsink.push(typesOfShip[typeOfShip]);
-		} else if (!gameJson.sinkShips.some(ship => {return ship.type == typesOfShip[typeOfShip].name})) {
+		} else if (!gameJson.sinkShips.some(ship => {
+				return ship.type == typesOfShip[typeOfShip].name
+			})) {
 			shipsUnsink.push(typesOfShip[typeOfShip]);
 		}
 	}
@@ -387,33 +481,34 @@ function showSalvoHistory() {
  ** Empieza la selección de salvoes para disparar
  *********************************************************/
 function startSelectingSalvoes() {
+	stopUpdateFromBackend();
 	salvoCells = Array.from(salvoCells);
-	salvoCells.forEach(function (cell, index) {
-		// Reviso que no se haya disparado en esa celda en turnos anteriores
-		if (!cell.classList.contains("salvo-fired")) {
-			// le asigno a las celdas la clase para hover (amarillo)
-			cell.classList.add("salvo-for-select");
-			// Agrego un listener para cambiar la clase de la celda que se presiona (verde)
-			// y para volver al estado anterior si se presiona de nuevo
-			$(cell).click(function () {
-				if (cell.classList.contains("salvo-for-select") && cellsSelectedForFired.length < NumberOfSalvoesToFire) {
-					cell.classList.remove("salvo-for-select");
-					cell.classList.add("salvo-selected");
-					cellsSelectedForFired.push(index);
-					console.log(cellsSelectedForFired);
-					// Indico los salvos que faltan para disparar
-					howManySalvoes();
-				} else if (cell.classList.contains("salvo-selected")) {
-					cell.classList.remove("salvo-selected");
-					cell.classList.add("salvo-for-select");
-					cellsSelectedForFired.splice(cellsSelectedForFired.indexOf(index), 1);
-					console.log(cellsSelectedForFired);
-					// Indico los salvos que faltan para disparar
-					howManySalvoes();
-				}
-			});
-		}
-	});
+	if (finishSalvoesButton.innerHTML == "") {
+		salvoCells.forEach(function (cell, index) {
+			// Reviso que no se haya disparado en esa celda en turnos anteriores
+			if (!cell.classList.contains("salvo-fired")) {
+				// le asigno a las celdas la clase para hover (amarillo)
+				cell.classList.add("salvo-for-select");
+				// Agrego un listener para cambiar la clase de la celda que se presiona (verde)
+				// y para volver al estado anterior si se presiona de nuevo
+				$(cell).click(function () {
+					if (cell.classList.contains("salvo-for-select") && cellsSelectedForFired.length < NumberOfSalvoesToFire) {
+						cell.classList.remove("salvo-for-select");
+						cell.classList.add("salvo-selected");
+						cellsSelectedForFired.push(index);
+						// Indico los salvos que faltan para disparar
+						howManySalvoes();
+					} else if (cell.classList.contains("salvo-selected")) {
+						cell.classList.remove("salvo-selected");
+						cell.classList.add("salvo-for-select");
+						cellsSelectedForFired.splice(cellsSelectedForFired.indexOf(index), 1);
+						// Indico los salvos que faltan para disparar
+						howManySalvoes();
+					}
+				});
+			}
+		});
+	}
 	// Agrego botón para que finalize la ubicación
 	finishSalvoesButton.innerHTML = '<button onclick="finishSelectingSalvoes()" class="finish-salvoes-button">Fire the Salvoes</button>';
 	howManySalvoes();
@@ -455,12 +550,18 @@ function finishSelectingSalvoes() {
 		// Limpio los salvos que se seleccionaron
 		cellsSelectedForFired = [];
 		// Busco los datos del backend y agrego los barcos a la grilla
-		dataFetch().then(function () {
-			printSalvoes(gameJson.salvoes); // Imprimo los salvoes
+		dataFetch().then(function (myJson) {
+			// Actualizo página
+			htmlRender();
+			if (gameJson.salvoes.length > 0) {
+				printSalvoes(gameJson.salvoes);
+			}
 		}).catch(function (error) {
 			// called when an error occurs anywhere in the chain
 			console.log("Request failed: " + error);
 		});
+		// vuelvo a poner el timer
+		updateFromBackend();
 	}).catch(function (xhr) {
 		document.getElementById("alert-text").innerHTML = JSON.parse(xhr.responseText).forbidden;
 	});
@@ -510,6 +611,11 @@ function dataFetch() {
 		// do something with the JSON
 		gameJson = myJson;
 		NumberOfTurn = gameJson.nextTurn;
+		if (gameJson.gamePlayerSate == gameStateEnum.waitOpponentSalvo) {
+			gameTurnHTML.innerHTML = NumberOfTurn - 1;
+		} else {
+			gameTurnHTML.innerHTML = NumberOfTurn;
+		}
 		showSalvoHistory();
 	});
 }
