@@ -16,7 +16,7 @@
 	</div>
 
 	<div id="main-body">
-		
+
 		<video autoplay muted loop id="back-video">
 			<source src="https://cdn2wotcom.gcdn.co//promo_web/lp_video/wows/LoadingGame-HD.mp4" type="video/mp4">
 		</video>
@@ -88,7 +88,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<h1 id="page-tittle" class="text-primary">Free Battleship</h1>
 
 		<!-- Leaderboard -->
@@ -108,7 +108,14 @@
 
 		<!-- List of games -->
 		<h3 class="mt-3 text-danger">List of games</h3>
-		<div id="create-game-button"></div>
+		<div class="row">
+			<div id="create-game-button" class="col-auto"></div>
+			<select name="game-list" id="game-list-select" class="col-auto">
+				<option value="all">Show All</option>
+				<option value="my-games">Show my games</option>
+				<option value="join">Show games for joining</option>
+			</select>
+		</div>
 		<ul id="game-list" class="list-group"></ul>
 	</div>
 
