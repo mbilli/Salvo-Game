@@ -66,9 +66,9 @@ function fetchFunction(url, init) {
 function populateLeaderboardTable() {
 	// Ordeno el json dependiendo del score y los partidos ganados, perdidos o empatados
 	leaderboardJson = leaderboardSorted(leaderboardJson);
-	// imprimo
+	// imprimo las 5 primeras posiciones
 	leaderboardTable.innerHTML = "";
-	leaderboardJson.forEach(player => {
+	leaderboardJson.slice(0,5).forEach(player => {
 		leaderboardTable.innerHTML += "<tr><th>" + player.playerName + "</th><td>" + player.score + "</td><td>" +
 			player.won + "</td><td>" + player.lost + "</td><td>" + player.tied + "</td></tr>"
 	});
@@ -167,7 +167,8 @@ function populateGameList(myJson) {
 			}
 			// Si el juego no esta lleno y no el jugador aún no participa, agrego el botón de join
 			if (game.gamePlayers.length < 2 && !playersGamePlayer) {
-				gameHTML += "<button onclick='joinAGame(" + game.gameId + ")' class='join-game-button'>Join Game -></button>";
+				gameHTML += "<button onclick='joinAGame(" + game.gameId + ")' class='join-game-button'>Join Game ";
+				gameHTML +="<i class='fa fa-user-plus' aria-hidden='true'></i></button>";
 			}
 		}
 		// Agrego la lista al html con <li></li>

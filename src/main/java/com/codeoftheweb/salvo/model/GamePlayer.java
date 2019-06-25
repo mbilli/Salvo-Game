@@ -114,9 +114,8 @@ public class GamePlayer {
 
   // Devuelve el estado de un gameplayer (ver GamePlayerState enum)
   public GamePlayerState getGamePlayerState() {
-    GamePlayerState stateResponse;
-    GamePlayer opponentGP = this.getGame().getGamePlayers().stream().filter(gp->gp.getId()!=this.getId()).findFirst()
-            .orElse(null);
+    GamePlayerState stateResponse = GamePlayerState.UNKNOWN;
+    GamePlayer opponentGP = this.getOpponentGamePlayer();
     if (opponentGP == null) {
       stateResponse = GamePlayerState.WAIT_OPPONENT_JOIN;
     } else if(this.getShips().isEmpty()) {
@@ -140,15 +139,19 @@ public class GamePlayer {
         // Empato el juego
       } else if(sunkOpponentNumber == 5 && sunkPlayerNumber == 5) {
         stateResponse = GamePlayerState.GAME_OVER_TIED;
-      } else if (this.getSalvoes().size() <= opponentGP.getSalvoes().size()) {
+      } else if (playerTurn <= opponentTurn) {
         stateResponse = GamePlayerState.ENTER_SALVO;
-      } else if (this.getSalvoes().size() > opponentGP.getSalvoes().size()) {
-        stateResponse = GamePlayerState.WAIT_OPPONENT_SALVO;
       } else {
-        stateResponse = GamePlayerState.UNKNOWN;
+        stateResponse = GamePlayerState.WAIT_OPPONENT_SALVO;
       }
     }
     return stateResponse;
+  }
+
+  // Devuelve el gameplayer del oponente o null
+  public GamePlayer getOpponentGamePlayer() {
+    return this.getGame().getGamePlayers().stream().filter(gp->gp.getId()!=this.getId()).findFirst()
+            .orElse(null);
   }
 
   // GamePlayer DTO for /games
@@ -173,8 +176,7 @@ public class GamePlayer {
     dto.put("salvoes", this.game.getGamePlayers().stream()
             .flatMap(gamePlayer -> gamePlayer.getSalvoes().stream().map(Salvo::makeDTO)));
     dto.put("nextTurn", this.getSalvoes().size() + 1);
-    GamePlayer opponentGP;
-    opponentGP = this.getGame().getGamePlayers().stream().filter(gp->gp.getId()!=this.getId()).findFirst().orElse(null);
+    GamePlayer opponentGP = this.getOpponentGamePlayer();
     if (opponentGP != null){
       dto.put("hits", this.salvoes.stream().map(salvo -> salvo.findHitsOnShips(opponentGP.getShips())));
       dto.put("sinkShips", this.isSink(opponentGP.getShips(), this.getSalvoes()).stream().map(Ship::makeDTO));

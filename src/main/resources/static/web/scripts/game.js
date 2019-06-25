@@ -165,6 +165,9 @@ function htmlRender() {
 	switch (gameJson.gamePlayerSate) {
 		case gameStateEnum.waitOpponentJoin:
 			gameStateHTML.innerHTML = "Waiting your opponent";
+			if (!gameJson.ships.length) {
+			gameStateHTML.innerHTML += " / You can place yours ships";
+			}
 			break;
 		case gameStateEnum.placeShips:
 			gameStateHTML.innerHTML = "Place your ships";
@@ -221,7 +224,7 @@ function startPlacingShips() {
 	// Permito que el jugador mueva los barcos
 	shipGrid.movable('.grid-stack-item', true);
 	// Agrego botón para que finalize la ubicación
-	finishPlacingButton.innerHTML = '<button onclick="finishPlacingShips()" class="finish-placing-button">Place the ships</button>';
+	finishPlacingButton.innerHTML = '<button onclick="finishPlacingShips()" class="finish-placing-button">Place the ships <i class="fa fa-ship" aria-hidden="true"></i></button>';
 }
 
 /*********************************************************
@@ -510,7 +513,7 @@ function startSelectingSalvoes() {
 		});
 	}
 	// Agrego botón para que finalize la ubicación
-	finishSalvoesButton.innerHTML = '<button onclick="finishSelectingSalvoes()" class="finish-salvoes-button">Fire the Salvoes</button>';
+	finishSalvoesButton.innerHTML = '<button onclick="finishSelectingSalvoes()" class="finish-salvoes-button">Fire the Salvoes <i class="fa fa-dot-circle-o" aria-hidden="true"></i></button>';
 	howManySalvoes();
 }
 // Función de soporte que indica cuantos salvoes faltan para disparar

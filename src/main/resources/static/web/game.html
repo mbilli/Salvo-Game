@@ -8,6 +8,7 @@
 	<link rel="stylesheet" href="dist/gridstack-extra.css" />
 	<link rel="stylesheet" href="styles/style.css" />
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
 	<title>Ship Locations</title>
 </head>
@@ -20,13 +21,15 @@
 
 	<div id="main-body">
 
-		<button onclick="window.location.href = '/web/games.html'" class="">Back to Games</button>
-		<!-- Panel de logout -->
-		<div id="logout-panel" class="row justify-content-end">
-			<div class="row justify-content-end mt-2">
-				<div class="col-auto">
-					<span id="player-name"></span><button onclick="playerSignOut()" class="logout-button">Log Out</button>
-				</div>
+		<div class="row justify-content-between mt-2 mb-2">
+			<button onclick="window.location.href = '/web/games.html'" class="col-auto back-button">
+				<i class="fa fa-arrow-left" aria-hidden="true"></i> Back to Games
+			</button>
+			<!-- Panel de logout -->
+			<div id="logout-panel" class="col-auto">
+				<span id="player-name"></span><button onclick="playerSignOut()" class="logout-button">
+				Log Out <i class="fa fa-sign-out" aria-hidden="true"></i>
+				</button>
 			</div>
 		</div>
 
@@ -72,6 +75,7 @@
 				<div id="salvo-history"></div>
 			</div>
 		</div>
+		<div id="footnote"><i class="fa fa-code" aria-hidden="true"></i> Designed and developed by Matias Billi</div>
 	</div>
 
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>

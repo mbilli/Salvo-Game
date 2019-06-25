@@ -2,6 +2,19 @@
   text-align: center;
 }
 
+#page-tittle {
+	text-align: center;
+}
+
+#back-video {
+	position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%; 
+  min-height: 100%;
+	z-index: -10;
+}
+
 #controls-console {
 	background-color: black;
 	color: green;
@@ -72,6 +85,20 @@
   display: none;
 }
 
+#leaderboard-table {
+	opacity: 0.7;
+}
+
+#game-list{
+	max-height: 400px;
+	overflow-y: scroll;
+}
+
+.list-group-item {
+	background-color: rgba(0,0,0,0.5);
+	color: white;
+}
+
 #salvo-history {
 	text-align: center;
 	margin-top: 10px;
@@ -114,34 +141,45 @@
 .logout-button {
   background-color: black;
   border-radius: 5px;
+  border: 1px solid white;
+  padding: 3px 10px;
+  width: 120px;
+  color: white;
+	font-weight: bold;
+}
+
+.back-button {
+	background-color: black;
+  border-radius: 5px;
   border: 1px solid black;
   padding: 3px 10px;
-  width: 80px;
+  width: 130px;
   color: white;
+	font-weight: bold;
 }
 
 .create-game-button {
 	width: 100px;
 	margin-bottom: 5px;
 	border-radius: 5px;
-	border: 2px solid black;
+	border: 1px solid white;
 	color: white;
 	background-color: black;
-}
-.create-game-button:hover {
-	color: black;
-	background-color: white;
+	font-weight: bold;
 }
 
 .join-game-button {
 	width: 130px;
 	margin-left: 15px;
 	border-radius: 5px;
-	border: 2px solid black;
+	border: 1px solid white;
 	color: white;
 	background-color: black;
+	font-weight: bold;
 }
-.join-game-button:hover {
+.join-game-button:hover,
+.create-game-button:hover,
+.back-button:hover {
 	color: black;
 	background-color: white;
 }
@@ -155,9 +193,14 @@
 	border: 2px solid black;
 	color: white;
 	background-color: black;
+	font-weight: bold;
 }
 
-
+#footnote {
+	font-size: 12px;
+	background-color: black;
+	color: white;
+}
 
 
 
