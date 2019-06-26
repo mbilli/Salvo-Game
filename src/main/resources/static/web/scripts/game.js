@@ -5,7 +5,8 @@ let opponent1 = {};
 let cellsSelectedForFired = [];
 let NumberOfSalvoesToFire = 3;
 let NumberOfTurn;
-var timerId;
+var backendTimerId;
+var generalTimerId;
 const urlParams = new URLSearchParams(location.search);
 const gamePlayerParam = urlParams.get('gp');
 const typesOfShip = {
@@ -69,6 +70,8 @@ var gridShipsOpponent = document.getElementById("grid-ships-opponent");
 var salvoCells = gridShipsOpponent.getElementsByClassName("salvo-cell");
 var salvoesText = document.getElementById("salvoes-text");
 var salvoHistory = document.getElementById("salvo-history");
+var salvoCounterHTML = document.getElementById("salvo-counter");
+var shipCounterHTML = document.getElementById("ship-counter");
 var reloadBody = document.getElementById("reload-body");
 var mainBody = document.getElementById("main-body");
 
@@ -106,7 +109,7 @@ $(() => {
  ** Establezco timer para comunicación con backend
  *********************************************************/
 function updateFromBackend() {
-	timerId = setInterval(function () {
+	backendTimerId = setInterval(function () {
 		dataFetch().then(function (myJson) {
 			// Actualizo página
 			htmlRender();
@@ -125,7 +128,44 @@ function updateFromBackend() {
  ** Detengo timer para comunicación con backend
  *********************************************************/
 function stopUpdateFromBackend() {
-	clearInterval(timerId);
+	clearInterval(backendTimerId);
+}
+
+/*********************************************************
+ ** Timer general para disparos y ubicación de barcos cada 1 seg.
+ ** Se pasa el id donde imprimir la cuenta regresiva, una función
+ ** que se ejecuta al final y el tiempo deseado
+ *********************************************************/
+function generalTimer1S(elementID, finishWithFunction, timer) {
+	// Si el timer no fue llamado
+	if (elementID.innerHTML == "") {
+		generalTimerId = setInterval(function () {
+			// Si no está seteado, empiezo la cuenta regresiva
+			if (elementID.innerText == "") {
+				elementID.innerText = timer;
+				// si ya está contano, decremento el HTML
+			}
+			// Si llega a 0, llamo a la función indiada, paro el timer y borro tl innerText
+			if (elementID.innerText <= 0) {
+				stopGeneralTimer1S(elementID);
+				finishWithFunction();
+			} else {
+				elementID.innerText = parseInt(elementID.innerText) - 1;
+			}
+			if (elementID.innerText == "10") {
+				elementID.style.color = "red";
+			}
+		}, 1000);
+	}
+}
+
+/*********************************************************
+ ** Detengo timer general
+ *********************************************************/
+function stopGeneralTimer1S(elementID) {
+	elementID.innerText = "";
+	elementID.style.color = "inherit";
+	clearInterval(generalTimerId);
 }
 
 /*********************************************************
@@ -166,7 +206,7 @@ function htmlRender() {
 		case gameStateEnum.waitOpponentJoin:
 			gameStateHTML.innerHTML = "Waiting your opponent";
 			if (!gameJson.ships.length) {
-			gameStateHTML.innerHTML += " / You can place yours ships";
+				gameStateHTML.innerHTML += " / You can place yours ships";
 			}
 			break;
 		case gameStateEnum.placeShips:
@@ -195,7 +235,7 @@ function htmlRender() {
 			gameStateHTML.innerHTML = "There have been some problems, probably is your fault!!!";
 	}
 	// Cargo el nombre del nuevo jugador
-	if(gameJson.gamePlayers.length == 2 && !opponent1.id){
+	if (gameJson.gamePlayers.length == 2 && !opponent1.id) {
 		assignPlayers();
 		printPlayers();
 	}
@@ -463,6 +503,7 @@ function printSalvoes(salvoesForPrint) {
  ** Muestra que barcos faltan destruir y la historia de tiros
  *********************************************************/
 function showSalvoHistory() {
+	let tempHTML;
 	let shipsUnsink = [];
 	for (typeOfShip in typesOfShip) {
 		if (!gameJson.sinkShips) {
@@ -473,11 +514,12 @@ function showSalvoHistory() {
 			shipsUnsink.push(typesOfShip[typeOfShip]);
 		}
 	}
-	salvoHistory.innerHTML = "<h6>You have to destroy:</h6><ul>";
+	tempHTML = '<div class="title-control">You have to destroy:</div><div class="row m-3 info-control">';
 	shipsUnsink.forEach(shipUnsink => {
-		salvoHistory.innerHTML += "<li>Ship: " + shipUnsink.name + " - Size: " + shipUnsink.size + "</li>";
+		tempHTML += '<div class="col-auto ">- Ship: ' + shipUnsink.name + ' (Size: ' + shipUnsink.size + ')</div>';
 	});
-	salvoHistory.innerHTML += "</ul>";
+	tempHTML += '</div>';
+	salvoHistory.innerHTML = tempHTML;
 }
 
 /*********************************************************
@@ -485,6 +527,7 @@ function showSalvoHistory() {
  *********************************************************/
 function startSelectingSalvoes() {
 	stopUpdateFromBackend();
+	generalTimer1S(salvoCounterHTML, finishSelectingSalvoes, 60);
 	salvoCells = Array.from(salvoCells);
 	if (finishSalvoesButton.innerHTML == "") {
 		salvoCells.forEach(function (cell, index) {
@@ -531,6 +574,7 @@ function howManySalvoes() {
  ** Termina la selección de salvoes para disparar
  *********************************************************/
 function finishSelectingSalvoes() {
+	stopGeneralTimer1S(salvoCounterHTML);
 	let salvoesBackEnd = [];
 	// transformo las ubicaciones de los salvoes y agrego info para enviar al backend
 	salvoesBackEnd = salvoesCells2BackEnd(cellsSelectedForFired);

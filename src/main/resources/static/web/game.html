@@ -33,13 +33,10 @@
 			</div>
 		</div>
 
-		<!-- Titulo de página -->
-		<div id="page-title">
-			<h4 id="players">Players: </h4>
-		</div>
-
-		<!-- consola del juego -->
+		<!-- consola superior del juego -->
 		<div id="controls-console">
+			<!-- Titulo de página -->
+		<h4 id="players" class="mb-3"></h4>
 			<div class="row">
 				<div class="col">
 					<span class="title-control">Game state</span><span id="game-state" class="info-control"></span>
@@ -61,6 +58,7 @@
 				</div>
 				<div id="finish-placing-button"></div>
 				<div class="text-center"><small id="alert-text"></small></div>
+				<div id="ship-counter"></div>
 				<div id="ship-history"></div>
 			</div>
 
@@ -72,9 +70,17 @@
 				</div>
 				<div id="finish-salvoes-button"></div>
 				<div class="text-center"><small id="salvoes-text"></small></div>
-				<div id="salvo-history"></div>
+				<div id="salvo-counter"></div>
 			</div>
 		</div>
+		
+		<!-- consola inferior del juego -->
+		<div id="controls-console-inf" class="mb-4">
+			<div class="row justify-content-center">
+				<div id="salvo-history" class="col-auto"></div>
+			</div>
+		</div>
+		
 		<div id="footnote"><i class="fa fa-code" aria-hidden="true"></i> Designed and developed by Matias Billi</div>
 	</div>
 
