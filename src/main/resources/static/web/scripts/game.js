@@ -224,12 +224,15 @@ function htmlRender() {
 			break;
 		case gameStateEnum.gameOverWon:
 			gameStateHTML.innerHTML = "Game over: You won";
+			salvoHistory.innerHTML = "GAME OVER: YOU WON <br> let's celebrate";
 			break;
 		case gameStateEnum.gameOverLost:
 			gameStateHTML.innerHTML = "Game over: You lost";
+			salvoHistory.innerHTML = "GAME OVER: YOU LOST <br> looser!!!";
 			break;
 		case gameStateEnum.gamOverTied:
 			gameStateHTML.innerHTML = "Game over: Tied";
+			salvoHistory.innerHTML = "GAME OVER: TIE <br> such a boring game";
 			break;
 		case gameStateEnum.unknown:
 			gameStateHTML.innerHTML = "There have been some problems, probably is your fault!!!";
@@ -503,7 +506,7 @@ function printSalvoes(salvoesForPrint) {
  ** Muestra que barcos faltan destruir y la historia de tiros
  *********************************************************/
 function showSalvoHistory() {
-	let tempHTML;
+	let tempHTML = "";
 	let shipsUnsink = [];
 	for (typeOfShip in typesOfShip) {
 		if (!gameJson.sinkShips) {
@@ -514,11 +517,13 @@ function showSalvoHistory() {
 			shipsUnsink.push(typesOfShip[typeOfShip]);
 		}
 	}
-	tempHTML = '<div class="title-control">You have to destroy:</div><div class="row m-3 info-control">';
-	shipsUnsink.forEach(shipUnsink => {
-		tempHTML += '<div class="col-auto ">- Ship: ' + shipUnsink.name + ' (Size: ' + shipUnsink.size + ')</div>';
-	});
-	tempHTML += '</div>';
+	if (shipsUnsink.length != 0) {
+		tempHTML = '<div class="title-control">You have to destroy:</div><div class="row m-3 info-control">';
+		shipsUnsink.forEach(shipUnsink => {
+			tempHTML += '<div class="col-auto ">- Ship: ' + shipUnsink.name + ' (Size: ' + shipUnsink.size + ')</div>';
+		});
+		tempHTML += '</div>';
+	}
 	salvoHistory.innerHTML = tempHTML;
 }
 

@@ -183,14 +183,14 @@ public class SalvoApplication {
       gpRepository.save(gameplayer14);
 
       // Save Scores
-      Score score1 = scoreRepository.save(new Score(jBauer, game1, 1));
-      Score score2 = scoreRepository.save(new Score(cObrian, game1, 0));
-      Score score3 = scoreRepository.save(new Score(jBauer, game2, 0.5));
-      Score score4 = scoreRepository.save(new Score(cObrian, game2, 0.5));
-      Score score5 = scoreRepository.save(new Score(cObrian, game3, 1.0));
-      Score score6 = scoreRepository.save(new Score(tAlmeida, game3, 0));
-      Score score7 = scoreRepository.save(new Score(cObrian, game4, 0.5));
-      Score score8 = scoreRepository.save(new Score(jBauer, game4, 0.5));
+      Score score1 = scoreRepository.save(new Score(jBauer, game1, 1, LocalDateTime.now()));
+      Score score2 = scoreRepository.save(new Score(cObrian, game1, 0, LocalDateTime.now()));
+      Score score3 = scoreRepository.save(new Score(jBauer, game2, 0.5, LocalDateTime.now()));
+      Score score4 = scoreRepository.save(new Score(cObrian, game2, 0.5, LocalDateTime.now()));
+      Score score5 = scoreRepository.save(new Score(cObrian, game3, 1.0, LocalDateTime.now()));
+      Score score6 = scoreRepository.save(new Score(tAlmeida, game3, 0, LocalDateTime.now()));
+      Score score7 = scoreRepository.save(new Score(cObrian, game4, 0.5, LocalDateTime.now()));
+      Score score8 = scoreRepository.save(new Score(jBauer, game4, 0.5, LocalDateTime.now()));
     };
   }
 }

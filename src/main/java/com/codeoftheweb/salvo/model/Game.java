@@ -64,6 +64,12 @@ public class Game {
     Map<String, Object> dto = new LinkedHashMap<String, Object>();
     dto.put("gameId", this.id);
     dto.put("created", this.getCreationDate());
+    Score oneScore = this.getScores().stream().findFirst().orElse(null);
+    LocalDateTime finishedDate = null;
+    if (oneScore != null) {
+      finishedDate = oneScore.getFinishDate();
+    }
+    dto.put("finished", finishedDate);
     dto.put("gamePlayers", this.gamePlayers.stream().map(GamePlayer::makeDTO));
     return dto;
   }

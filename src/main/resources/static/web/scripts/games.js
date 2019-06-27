@@ -68,7 +68,7 @@ function populateLeaderboardTable() {
 	leaderboardJson = leaderboardSorted(leaderboardJson);
 	// imprimo las 5 primeras posiciones
 	leaderboardTable.innerHTML = "";
-	leaderboardJson.slice(0,5).forEach(player => {
+	leaderboardJson.slice(0, 5).forEach(player => {
 		leaderboardTable.innerHTML += "<tr><th>" + player.playerName + "</th><td>" + player.score + "</td><td>" +
 			player.won + "</td><td>" + player.lost + "</td><td>" + player.tied + "</td></tr>"
 	});
@@ -151,7 +151,11 @@ function populateGameList(myJson) {
 		// defino el html de la lista sin <li></li>
 		let gameHTML = "GAME ID:" + game.gameId + " - CREATED: " + gameDate.toLocaleString() +
 			" - PLAYERS: " + playersEmail.join(", ");
-
+		// Si terminó, agrego la fecha de finalización
+		if (game.finished) {
+			let finishedDate = new Date(game.finished);
+			gameHTML += " FINISHED: " + finishedDate.toLocaleString();
+		}
 		// Para agregar links a los juegos, el jugador debe estar logueado
 		// Para agregar el botón de unirse, el jugador debe estar logueado
 		if (playerJson) {
@@ -168,7 +172,7 @@ function populateGameList(myJson) {
 			// Si el juego no esta lleno y no el jugador aún no participa, agrego el botón de join
 			if (game.gamePlayers.length < 2 && !playersGamePlayer) {
 				gameHTML += "<button onclick='joinAGame(" + game.gameId + ")' class='join-game-button'>Join Game ";
-				gameHTML +="<i class='fa fa-user-plus' aria-hidden='true'></i></button>";
+				gameHTML += "<i class='fa fa-user-plus' aria-hidden='true'></i></button>";
 			}
 		}
 		// Agrego la lista al html con <li></li>

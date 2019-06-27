@@ -1,3 +1,8 @@
+#logo {
+	height:55px;
+	margin-bottom: -50px;
+}
+
 #players {
 	text-align: center;
 	color: white;
@@ -12,13 +17,33 @@
 	z-index: -10;
 }
 
+#back-img {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	min-width: 100%;
+	min-height: 100%;
+	z-index: -10;
+}
+#overlay { 
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	min-width: 100%;
+	min-height: 100%;
+	background-color: black;
+	opacity: 0.6;
+	z-index: -9;
+}
+
 #controls-console,
 #controls-console-inf {
-	background-color: black;
+	background-color: rgba(0,0,0,0.6);
 	color: green;
 	padding: 15px;
 	font-weight: bold;
 	border-radius: 10px;
+	border: 1px solid rgba(255,255,255,0.6);
 }
 
 .title-control {
@@ -166,7 +191,7 @@
 .back-button {
 	background-color: black;
 	border-radius: 5px;
-	border: 1px solid black;
+	border: 1px solid white;
 	padding: 3px 10px;
 	width: 130px;
 	color: white;
@@ -209,7 +234,7 @@
 .finish-salvoes-button {
 	margin: 10px;
 	border-radius: 5px;
-	border: 2px solid black;
+	border: 2px solid white;
 	color: white;
 	background-color: black;
 	font-weight: bold;
@@ -219,6 +244,20 @@
 	font-size: 12px;
 	background-color: black;
 	color: white;
+	padding: 5px;
+	margin-top: 5px;
+	text-align: center
+}
+
+#game-list::-webkit-scrollbar {
+	width: 10px;
+}
+#game-list::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+#game-list::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.5);
+  outline: 1px solid black;
 }
 
 

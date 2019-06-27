@@ -4,6 +4,7 @@ import com.codeoftheweb.salvo.model.*;
 import com.codeoftheweb.salvo.repository.GamePlayerRepository;
 import com.codeoftheweb.salvo.repository.GameRepository;
 import com.codeoftheweb.salvo.repository.PlayerRepository;
+import com.codeoftheweb.salvo.repository.ScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
@@ -28,6 +30,8 @@ public class SalvoController {
   private PlayerRepository playerRepository;
   @Autowired
   private GamePlayerRepository gamePlayerRepository;
+  @Autowired
+  private ScoreRepository scoreRepository;
 
   @RequestMapping("/games")
   public Map<String, Object> getApiGames(Authentication authentication) {
@@ -151,24 +155,40 @@ public class SalvoController {
         messageResponse = new ResponseEntity<>(makeMap("unauthorized", "The game does not exist"), HttpStatus.UNAUTHORIZED);
       } else {
         Player player = playerRepository.findByUserName(authentication.getName());
+        GamePlayerState gamePlayerState = gamePlayer.getGamePlayerState();
         if (gamePlayer.getPlayer().getId() != player.getId()) {
           messageResponse = new ResponseEntity<>(makeMap("unauthorized", "This is not your game"), HttpStatus.UNAUTHORIZED);
         } else if (gamePlayer.getShips().size() == 0) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "Ships must be place"), HttpStatus.FORBIDDEN);
-        } else if (gamePlayer.getGamePlayerState() == GamePlayerState.GAME_OVER_LOST
-                || gamePlayer.getGamePlayerState() == GamePlayerState.GAME_OVER_WON
-                || gamePlayer.getGamePlayerState() == GamePlayerState.GAME_OVER_TIED) {
+        } else if (gamePlayerState == GamePlayerState.GAME_OVER_LOST
+                || gamePlayerState == GamePlayerState.GAME_OVER_WON
+                || gamePlayerState == GamePlayerState.GAME_OVER_TIED) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "Game is over"), HttpStatus.FORBIDDEN);
         } else if (gamePlayer.getSalvoes().size() + 1 != salvo.getTurnNumber()) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "Wrong turn for salvo"), HttpStatus.FORBIDDEN);
         } else if (salvo.getSalvoLocation().size() > 5) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "Wrong number of salvoes fired"), HttpStatus.FORBIDDEN);
-        }  else if (gamePlayer.getGamePlayerState() != GamePlayerState.ENTER_SALVO) {
+        }  else if (gamePlayerState != GamePlayerState.ENTER_SALVO) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "You can not fire at this moment"), HttpStatus.FORBIDDEN);
         } else {
           gamePlayer.addSalvo(salvo);
           gamePlayerRepository.save(gamePlayer);
           messageResponse = new ResponseEntity<>(makeMap("created", "The salvoes have been placed"), HttpStatus.CREATED);
+
+          // Si  fué el último tiro, actualizo el score
+          gamePlayerState = gamePlayer.getGamePlayerState();
+          GamePlayer opponentGamePlayer = gamePlayer.getOpponentGamePlayer();
+          LocalDateTime localDateTime = LocalDateTime.now();
+          if (gamePlayerState == GamePlayerState.GAME_OVER_WON) {
+            scoreRepository.save(new Score(gamePlayer.getPlayer(), gamePlayer.getGame(), 1, localDateTime));
+            scoreRepository.save(new Score(opponentGamePlayer.getPlayer(), gamePlayer.getGame(), 0, localDateTime));
+          } else if (gamePlayerState == GamePlayerState.GAME_OVER_TIED) {
+            scoreRepository.save(new Score(gamePlayer.getPlayer(), gamePlayer.getGame(), 0.5, localDateTime));
+            scoreRepository.save(new Score(opponentGamePlayer.getPlayer(), gamePlayer.getGame(), 0.5, localDateTime));
+          } else if (gamePlayerState == GamePlayerState.GAME_OVER_LOST) {
+            scoreRepository.save(new Score(gamePlayer.getPlayer(), gamePlayer.getGame(), 0, localDateTime));
+            scoreRepository.save(new Score(opponentGamePlayer.getPlayer(), gamePlayer.getGame(), 1, localDateTime));
+          }
         }
       }
     }
