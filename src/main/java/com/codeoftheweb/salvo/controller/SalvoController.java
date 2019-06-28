@@ -133,6 +133,8 @@ public class SalvoController {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "The ships have been already placed"), HttpStatus.FORBIDDEN);
         } else if (ships.size() != 5) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "You should place 5 ships"), HttpStatus.FORBIDDEN);
+        } else if (!ships.stream().allMatch(ship -> gamePlayer.checkLocation(ship.getShipLocation()))) {
+          messageResponse = new ResponseEntity<>(makeMap("forbidden", "The Locations are not allowed"), HttpStatus.FORBIDDEN);
         } else {
           ships.stream().forEach(gamePlayer::addShip);
           gamePlayerRepository.save(gamePlayer);
@@ -170,6 +172,8 @@ public class SalvoController {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "Wrong number of salvoes fired"), HttpStatus.FORBIDDEN);
         }  else if (gamePlayerState != GamePlayerState.ENTER_SALVO) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "You can not fire at this moment"), HttpStatus.FORBIDDEN);
+        } else if (!gamePlayer.checkLocation(salvo.getSalvoLocation())) {
+            messageResponse = new ResponseEntity<>(makeMap("forbidden", "The Locations are not allowed"), HttpStatus.FORBIDDEN);
         } else {
           gamePlayer.addSalvo(salvo);
           gamePlayerRepository.save(gamePlayer);

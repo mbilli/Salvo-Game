@@ -74,6 +74,8 @@ var salvoCounterHTML = document.getElementById("salvo-counter");
 var shipCounterHTML = document.getElementById("ship-counter");
 var reloadBody = document.getElementById("reload-body");
 var mainBody = document.getElementById("main-body");
+var playerShipBox = document.getElementById("player-ship-box");
+var opponentShipBox = document.getElementById("opponent-ship-box");
 
 
 // Cargo la grilla, traigo los datos del backend e imprimo todo
@@ -152,7 +154,7 @@ function generalTimer1S(elementID, finishWithFunction, timer) {
 			} else {
 				elementID.innerText = parseInt(elementID.innerText) - 1;
 			}
-			if (elementID.innerText == "10") {
+			if (elementID.innerText == "20") {
 				elementID.style.color = "red";
 			}
 		}, 1000);
@@ -208,31 +210,40 @@ function htmlRender() {
 			if (!gameJson.ships.length) {
 				gameStateHTML.innerHTML += " / You can place yours ships";
 			}
+			changeGridView("player");
 			break;
 		case gameStateEnum.placeShips:
 			gameStateHTML.innerHTML = "Place your ships";
+			opponentShipBox.style.display = "none";
+			changeGridView("player");
 			break;
 		case gameStateEnum.waitOpponentShips:
 			gameStateHTML.innerHTML = "Waiting opponent's ships";
+			changeGridView("player");
 			break;
 		case gameStateEnum.enterSalvo:
 			gameStateHTML.innerHTML = "Enter your salvo";
+			changeGridView("opponent");
 			startSelectingSalvoes();
 			break;
 		case gameStateEnum.waitOpponentSalvo:
 			gameStateHTML.innerHTML = "Waiting opponent's salvos";
+			changeGridView("player");
 			break;
 		case gameStateEnum.gameOverWon:
 			gameStateHTML.innerHTML = "Game over: You won";
 			salvoHistory.innerHTML = "GAME OVER: YOU WON <br> let's celebrate";
+			changeGridView("both");
 			break;
 		case gameStateEnum.gameOverLost:
 			gameStateHTML.innerHTML = "Game over: You lost";
 			salvoHistory.innerHTML = "GAME OVER: YOU LOST <br> looser!!!";
+			changeGridView("both");
 			break;
 		case gameStateEnum.gamOverTied:
 			gameStateHTML.innerHTML = "Game over: Tied";
 			salvoHistory.innerHTML = "GAME OVER: TIE <br> such a boring game";
+			changeGridView("both");
 			break;
 		case gameStateEnum.unknown:
 			gameStateHTML.innerHTML = "There have been some problems, probably is your fault!!!";
@@ -248,6 +259,23 @@ function htmlRender() {
 	reloadBody.innerHTML = "";
 	// muestro la página una vez que está todo en su lugar ;)
 	mainBody.style.visibility = "visible";
+}
+
+/*********************************************************
+ ** Selecciona que grilla mostrar, la del oponente o la 
+ ** del player. Recibe "player", "opponent" o "both"
+ *********************************************************/
+function changeGridView(gridSelected) {
+	if (gridSelected == "player") {
+		playerShipBox.style.display = "block";
+		opponentShipBox.style.display = "none";
+	} else if (gridSelected == "opponent") {
+		playerShipBox.style.display = "none";
+		opponentShipBox.style.display = "block";
+	} else if (gridSelected == "both") {
+		playerShipBox.style.display = "block";
+		opponentShipBox.style.display = "block";
+	}
 }
 
 /*********************************************************

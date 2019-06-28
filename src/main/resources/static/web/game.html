@@ -31,34 +31,38 @@
 				</button>
 				<!-- Panel de logout -->
 				<div id="logout-panel" class="col-auto">
-					<span id="player-name"></span><button onclick="playerSignOut()" class="logout-button">
+					<span id="player-name" class="text-light"></span><button onclick="playerSignOut()" class="logout-button">
 						Log Out <i class="fa fa-sign-out" aria-hidden="true"></i>
 					</button>
 				</div>
 			</div>
-
+			<!-- Titulo de página -->
+			<h4 id="players" class="mb-3"></h4>
 			<!-- consola superior del juego -->
-			<div id="controls-console">
-				<!-- Titulo de página -->
-				<h4 id="players" class="mb-3"></h4>
-				<div class="row">
-					<div class="col-6">
-						<span class="title-control">Game state</span><span id="game-state" class="info-control"></span>
-					</div>
-					<div class="col-3">
-						<span class="title-control">Turn</span><span id="game-turn" class="info-control"></span>
-					</div>
-					<div class="col-auto">
-						<span class="title-control">Timer</span><span id="salvo-counter" class="info-control"></span>
-					</div>
-					<div class=""><img class="radar-image" src="images/radar.gif"> </div>
-				</div>
-			</div>
-
-			<!-- Area de juego -->
-			<!-- Grilla del jugador -->
 			<div class="row">
-				<div class="col">
+				<div id="controls-console" class="col-12 col-lg">
+
+					<div class="row">
+						<div class="col-12 col-md-7">
+							<span class="title-control">Game state</span><span id="game-state" class="info-control"></span>
+						</div>
+						<div class="col-auto">
+							<span class="title-control">Turn</span><span id="game-turn" class="info-control"></span>
+						</div>
+						<div class="col-auto">
+							<span class="title-control">Timer</span><span id="salvo-counter" class="info-control"></span>
+						</div>
+						<div class="col-auto"><img class="radar-image" src="images/radar.gif"></div>
+					</div>
+					<div class="row justify-content-center">
+						<div id="salvo-history" class="col-auto"></div>
+					</div>
+				</div>
+
+				<!-- Area de juego -->
+				<!-- Grilla del jugador -->
+
+				<div id="player-ship-box" class="col">
 					<h5 class="text-center mt-2 text-danger">Your Ships</h5>
 					<div class="grid-ships-player">
 						<div id="player-grid" class="grid-stack grid-stack-10"></div>
@@ -70,7 +74,7 @@
 				</div>
 
 				<!-- Grilla del oponente -->
-				<div class="col">
+				<div id="opponent-ship-box" class="col">
 					<h5 class="text-center mt-2 text-danger">Opponent Ships</h5>
 					<div id="grid-ships-opponent" class="grid-ships-opponent" class="col">
 						<div id="opponent-grid" class="grid-stack grid-stack-10"></div>
@@ -79,13 +83,7 @@
 					<div class="text-center"><small id="salvoes-text"></small></div>
 
 				</div>
-			</div>
 
-			<!-- consola inferior del juego -->
-			<div id="controls-console-inf" class="mb-3">
-				<div class="row justify-content-center">
-					<div id="salvo-history" class="col-auto"></div>
-				</div>
 			</div>
 		</div>
 	</div>
