@@ -1,3 +1,7 @@
+body {
+	font-size: 15px !important;
+}
+
 #logo {
 	height:55px;
 	margin-bottom: -50px;
@@ -36,6 +40,14 @@
 	z-index: -9;
 }
 
+#game-list-select {
+	border-radius: 5px;
+	border: 1px solid white;
+	background-color: black;
+	color: white;
+	margin-bottom: 5px;
+}
+
 #controls-console,
 #controls-console-inf {
 	background-color: rgba(0,0,0,0.6);
@@ -58,9 +70,12 @@
 }
 
 .radar-image {
-	height: 50px;
+	height: 45px;
 	margin-right: 50px;
-	margin-top: -10px;
+	position: absolute;
+	border-radius: 50px;
+	top: 0px;
+	left: 0px;
 }
 
 .info-control {
@@ -76,6 +91,7 @@
 #alert-text,
 #salvoes-text {
 	color: red;
+	font-weight: bold;
 }
 
 .salvo-fired,
@@ -226,6 +242,16 @@
 	background-color: white;
 }
 
+.select-grid-button {
+	width: 120px;
+	margin-bottom: 15px;
+	border-radius: 5px;
+	border: 1px solid white;
+	color: white;
+	background-color: black;
+	font-weight: bold;
+}
+
 #finish-placing-button,
 #finish-salvoes-button {
 	text-align: center;
@@ -348,6 +374,10 @@
 	height: 495px;
 	width: 495px;
 	margin: auto;
+}
+
+#opponent-ship-box {
+	display: none;
 }
 
 #player-grid,

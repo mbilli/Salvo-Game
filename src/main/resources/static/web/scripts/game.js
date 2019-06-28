@@ -3,10 +3,11 @@ let gameJson;
 let player1 = {};
 let opponent1 = {};
 let cellsSelectedForFired = [];
-let NumberOfSalvoesToFire = 3;
+let NumberOfSalvoesToFire = 5;
 let NumberOfTurn;
 var backendTimerId;
 var generalTimerId;
+var gamePlayerState = "";
 const urlParams = new URLSearchParams(location.search);
 const gamePlayerParam = urlParams.get('gp');
 const typesOfShip = {
@@ -63,9 +64,9 @@ var init = {
 var playersId = document.getElementById("players");
 var gameStateHTML = document.getElementById("game-state");
 var gameTurnHTML = document.getElementById("game-turn");
-var logOutPanel = document.getElementById("logout-panel");
-var finishPlacingButton = document.getElementById("finish-placing-button");
-var finishSalvoesButton = document.getElementById("finish-salvoes-button");
+var logOutPanelHTML = document.getElementById("logout-panel");
+var finishPlacingButtonHTML = document.getElementById("finish-placing-button");
+var finishSalvoesButtonHTML = document.getElementById("finish-salvoes-button");
 var gridShipsOpponent = document.getElementById("grid-ships-opponent");
 var salvoCells = gridShipsOpponent.getElementsByClassName("salvo-cell");
 var salvoesText = document.getElementById("salvoes-text");
@@ -74,14 +75,15 @@ var salvoCounterHTML = document.getElementById("salvo-counter");
 var shipCounterHTML = document.getElementById("ship-counter");
 var reloadBody = document.getElementById("reload-body");
 var mainBody = document.getElementById("main-body");
-var playerShipBox = document.getElementById("player-ship-box");
-var opponentShipBox = document.getElementById("opponent-ship-box");
+var playerShipBoxHTML = document.getElementById("player-ship-box");
+var opponentShipBoxHTML = document.getElementById("opponent-ship-box");
+var controlsConsoleHTML = document.getElementById("controls-console");
 
 
 // Cargo la grilla, traigo los datos del backend e imprimo todo
 $(() => {
 	dataFetch().then(function (myJson) {
-		logOutPanel.style.display = "block";
+		logOutPanelHTML.style.display = "block";
 		assignPlayers(); // separo los datos del jugador y el oponente
 		printPlayers(); // Imprimo los nombres de los jugadores
 		loadGrid(); // Cargo grilla
@@ -118,7 +120,7 @@ function updateFromBackend() {
 			if (gameJson.salvoes.length > 0) {
 				printSalvoes(gameJson.salvoes);
 			}
-			console.log("backend");
+			//console.log("backend");
 		}).catch(function (error) {
 			// called when an error occurs anywhere in the chain
 			console.log("Request failed: " + error);
@@ -166,7 +168,7 @@ function generalTimer1S(elementID, finishWithFunction, timer) {
  *********************************************************/
 function stopGeneralTimer1S(elementID) {
 	elementID.innerText = "";
-	elementID.style.color = "inherit";
+	elementID.style.color = "white";
 	clearInterval(generalTimerId);
 }
 
@@ -191,7 +193,7 @@ function assignPlayers() {
  *********************************************************/
 function printPlayers() {
 	if (!opponent1.username) {
-		opponent1.username = "(Waiting for your opponent)";
+		opponent1.username = "<span class='text-danger'>Waiting your opponent</span>";
 	}
 
 	// escribo en el dom
@@ -203,51 +205,56 @@ function printPlayers() {
  ** Render Functions
  *********************************************************/
 function htmlRender() {
-	// Reviso el estado del juego
-	switch (gameJson.gamePlayerSate) {
-		case gameStateEnum.waitOpponentJoin:
-			gameStateHTML.innerHTML = "Waiting your opponent";
-			if (!gameJson.ships.length) {
-				gameStateHTML.innerHTML += " / You can place yours ships";
-			}
-			changeGridView("player");
-			break;
-		case gameStateEnum.placeShips:
-			gameStateHTML.innerHTML = "Place your ships";
-			opponentShipBox.style.display = "none";
-			changeGridView("player");
-			break;
-		case gameStateEnum.waitOpponentShips:
-			gameStateHTML.innerHTML = "Waiting opponent's ships";
-			changeGridView("player");
-			break;
-		case gameStateEnum.enterSalvo:
-			gameStateHTML.innerHTML = "Enter your salvo";
-			changeGridView("opponent");
-			startSelectingSalvoes();
-			break;
-		case gameStateEnum.waitOpponentSalvo:
-			gameStateHTML.innerHTML = "Waiting opponent's salvos";
-			changeGridView("player");
-			break;
-		case gameStateEnum.gameOverWon:
-			gameStateHTML.innerHTML = "Game over: You won";
-			salvoHistory.innerHTML = "GAME OVER: YOU WON <br> let's celebrate";
-			changeGridView("both");
-			break;
-		case gameStateEnum.gameOverLost:
-			gameStateHTML.innerHTML = "Game over: You lost";
-			salvoHistory.innerHTML = "GAME OVER: YOU LOST <br> looser!!!";
-			changeGridView("both");
-			break;
-		case gameStateEnum.gamOverTied:
-			gameStateHTML.innerHTML = "Game over: Tied";
-			salvoHistory.innerHTML = "GAME OVER: TIE <br> such a boring game";
-			changeGridView("both");
-			break;
-		case gameStateEnum.unknown:
-			gameStateHTML.innerHTML = "There have been some problems, probably is your fault!!!";
+	// Reviso si hay un nuevo estado del juego
+	if (gamePlayerState != gameJson.gamePlayerState) {
+		gamePlayerState = gameJson.gamePlayerState;
+		// Reviso el estado del juego
+		switch (gamePlayerState) {
+			case gameStateEnum.waitOpponentJoin:
+				gameStateHTML.innerHTML = "Waiting your opponent";
+				changeGridView("player");
+				if (!gameJson.ships.length) {
+					gameStateHTML.innerHTML += " / You can place yours ships";
+				}
+				changeGridView("player");
+				break;
+			case gameStateEnum.placeShips:
+				gameStateHTML.innerHTML = "Place your ships";
+				changeGridView("player");
+				break;
+			case gameStateEnum.waitOpponentShips:
+				gameStateHTML.innerHTML = "Waiting opponent's ships";
+				changeGridView("player");
+				break;
+			case gameStateEnum.enterSalvo:
+				gameStateHTML.innerHTML = "Enter your salvo";
+				setTimeout(function() { changeGridView("opponent"); }, 2000);
+				startSelectingSalvoes();
+				break;
+			case gameStateEnum.waitOpponentSalvo:
+				gameStateHTML.innerHTML = "Waiting opponent's salvos";
+				setTimeout(function() { changeGridView("player"); }, 2000);
+				break;
+			case gameStateEnum.gameOverWon:
+				gameStateHTML.innerHTML = "Game over: You won";
+				salvoHistory.innerHTML = "GAME OVER: YOU WON <br> let's celebrate";
+				changeGridView("both");
+				break;
+			case gameStateEnum.gameOverLost:
+				gameStateHTML.innerHTML = "Game over: You lost";
+				salvoHistory.innerHTML = "GAME OVER: YOU LOST <br> looser!!!";
+				changeGridView("both");
+				break;
+			case gameStateEnum.gamOverTied:
+				gameStateHTML.innerHTML = "Game over: Tied";
+				salvoHistory.innerHTML = "GAME OVER: TIE <br> such a boring game";
+				changeGridView("both");
+				break;
+			case gameStateEnum.unknown:
+				gameStateHTML.innerHTML = "There have been some problems, probably is your fault!!!";
+		}
 	}
+
 	// Cargo el nombre del nuevo jugador
 	if (gameJson.gamePlayers.length == 2 && !opponent1.id) {
 		assignPlayers();
@@ -267,14 +274,17 @@ function htmlRender() {
  *********************************************************/
 function changeGridView(gridSelected) {
 	if (gridSelected == "player") {
-		playerShipBox.style.display = "block";
-		opponentShipBox.style.display = "none";
+		playerShipBoxHTML.style.display = "block";
+		opponentShipBoxHTML.style.display = "none";
+		controlsConsoleHTML.classList.add("col-lg");
 	} else if (gridSelected == "opponent") {
-		playerShipBox.style.display = "none";
-		opponentShipBox.style.display = "block";
+		playerShipBoxHTML.style.display = "none";
+		opponentShipBoxHTML.style.display = "block";
+		controlsConsoleHTML.classList.add("col-lg");
 	} else if (gridSelected == "both") {
-		playerShipBox.style.display = "block";
-		opponentShipBox.style.display = "block";
+		playerShipBoxHTML.style.display = "block";
+		opponentShipBoxHTML.style.display = "block";
+		controlsConsoleHTML.classList.remove("col-lg");
 	}
 }
 
@@ -295,7 +305,7 @@ function startPlacingShips() {
 	// Permito que el jugador mueva los barcos
 	shipGrid.movable('.grid-stack-item', true);
 	// Agrego botón para que finalize la ubicación
-	finishPlacingButton.innerHTML = '<button onclick="finishPlacingShips()" class="finish-placing-button">Place the ships <i class="fa fa-ship" aria-hidden="true"></i></button>';
+	finishPlacingButtonHTML.innerHTML = '<button onclick="finishPlacingShips()" class="finish-placing-button">Place the ships <i class="fa fa-ship" aria-hidden="true"></i></button>';
 }
 
 /*********************************************************
@@ -310,7 +320,7 @@ function finishPlacingShips() {
 	createShips(gamePlayerParam, shipsPosition).then(function () {
 		// Una vez que los barcos se crearon en el backend
 		// Saco botón para finalizar la ubicación
-		finishPlacingButton.innerHTML = "";
+		finishPlacingButtonHTML.innerHTML = "";
 		document.getElementById("alert-text").innerHTML = "";
 		// Saco los listener para rotar
 		rotateShips("carrier", 5, false);
@@ -546,7 +556,7 @@ function showSalvoHistory() {
 		}
 	}
 	if (shipsUnsink.length != 0) {
-		tempHTML = '<div class="title-control">You have to destroy:</div><div class="row m-3 info-control">';
+		tempHTML = '<div class="title-control">You have to destroy:</div><div class="row mr-3 ml-3 info-control">';
 		shipsUnsink.forEach(shipUnsink => {
 			tempHTML += '<div class="col-auto ">- Ship: ' + shipUnsink.name + ' (Size: ' + shipUnsink.size + ')</div>';
 		});
@@ -562,7 +572,7 @@ function startSelectingSalvoes() {
 	stopUpdateFromBackend();
 	generalTimer1S(salvoCounterHTML, finishSelectingSalvoes, 60);
 	salvoCells = Array.from(salvoCells);
-	if (finishSalvoesButton.innerHTML == "") {
+	if (finishSalvoesButtonHTML.innerHTML == "") {
 		salvoCells.forEach(function (cell, index) {
 			// Reviso que no se haya disparado en esa celda en turnos anteriores
 			if (!cell.classList.contains("salvo-fired")) {
@@ -589,7 +599,7 @@ function startSelectingSalvoes() {
 		});
 	}
 	// Agrego botón para que finalize la ubicación
-	finishSalvoesButton.innerHTML = '<button onclick="finishSelectingSalvoes()" class="finish-salvoes-button">Fire the Salvoes <i class="fa fa-dot-circle-o" aria-hidden="true"></i></button>';
+	finishSalvoesButtonHTML.innerHTML = '<button onclick="finishSelectingSalvoes()" class="finish-salvoes-button">Fire the Salvoes <i class="fa fa-dot-circle-o" aria-hidden="true"></i></button>';
 	howManySalvoes();
 }
 // Función de soporte que indica cuantos salvoes faltan para disparar
@@ -615,7 +625,7 @@ function finishSelectingSalvoes() {
 	saveSalvoes(gamePlayerParam, salvoesBackEnd).then(function () {
 		// Una vez que los salvoes se crearon en el backend
 		// Saco botón para que finalize la ubicación
-		finishSalvoesButton.innerHTML = '';
+		finishSalvoesButtonHTML.innerHTML = '';
 		salvoesText.innerHTML = '';
 		// Recorro las celdas para ...
 		salvoCells.forEach(function (cell, index) {
@@ -645,6 +655,7 @@ function finishSelectingSalvoes() {
 	}).catch(function (xhr) {
 		document.getElementById("alert-text").innerHTML = JSON.parse(xhr.responseText).forbidden;
 	});
+	gamePlayerState = "Cambio para que entre al switch en htmlRender";
 }
 
 /*********************************************************
@@ -691,7 +702,7 @@ function dataFetch() {
 		// do something with the JSON
 		gameJson = myJson;
 		NumberOfTurn = gameJson.nextTurn;
-		if (gameJson.gamePlayerSate == gameStateEnum.waitOpponentSalvo) {
+		if (gameJson.gamePlayerState == gameStateEnum.waitOpponentSalvo) {
 			gameTurnHTML.innerHTML = NumberOfTurn - 1;
 		} else {
 			gameTurnHTML.innerHTML = NumberOfTurn;

@@ -198,7 +198,7 @@ public class GamePlayer {
       dto.put("hits", this.salvoes.stream().map(salvo -> salvo.findHitsOnShips(opponentGP.getShips())));
       dto.put("sinkShips", this.isSink(opponentGP.getShips(), this.getSalvoes()).stream().map(Ship::makeDTO));
     }
-    dto.put("gamePlayerSate", this.getGamePlayerState());
+    dto.put("gamePlayerState", this.getGamePlayerState());
     return dto;
   }
 }

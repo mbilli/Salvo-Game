@@ -25,7 +25,7 @@
 
 		<div id="main-body">
 
-			<div class="row justify-content-between mt-2 mb-2">
+			<div class="row justify-content-between mt-1 mb-1">
 				<button onclick="window.location.href = '/web/games.html'" class="col-auto back-button">
 					<i class="fa fa-arrow-left" aria-hidden="true"></i> Back to Games
 				</button>
@@ -37,13 +37,19 @@
 				</div>
 			</div>
 			<!-- Titulo de página -->
-			<h4 id="players" class="mb-3"></h4>
+			<h5 id="players" class="mb-2"></h5>
 			<!-- consola superior del juego -->
 			<div class="row">
 				<div id="controls-console" class="col-12 col-lg">
-
+					<img class="radar-image" src="images/radar.gif">
+					<div class="text-center">
+						<h5 class="text-light">Game Information</h5>
+						<button class="select-grid-button" onclick="changeGridView('player')">Your ships</button>
+						<button class="select-grid-button" onclick="changeGridView('opponent')">Enemy's ships</button>
+						<button class="select-grid-button" onclick="changeGridView('both')">Both</button>
+					</div>
 					<div class="row">
-						<div class="col-12 col-md-7">
+						<div class="col-12 col-sd-7">
 							<span class="title-control">Game state</span><span id="game-state" class="info-control"></span>
 						</div>
 						<div class="col-auto">
@@ -52,38 +58,33 @@
 						<div class="col-auto">
 							<span class="title-control">Timer</span><span id="salvo-counter" class="info-control"></span>
 						</div>
-						<div class="col-auto"><img class="radar-image" src="images/radar.gif"></div>
 					</div>
 					<div class="row justify-content-center">
+						<div id="ship-history"></div>
 						<div id="salvo-history" class="col-auto"></div>
 					</div>
+					<div id="finish-placing-button"></div>
+					<div id="finish-salvoes-button"></div>
+					<div class="text-center"><small id="alert-text"></small></div>
+					<div class="text-center"><small id="salvoes-text"></small></div>
 				</div>
 
 				<!-- Area de juego -->
 				<!-- Grilla del jugador -->
-
 				<div id="player-ship-box" class="col">
-					<h5 class="text-center mt-2 text-danger">Your Ships</h5>
+					<h5 class="text-center text-light">Your Ships</h5>
 					<div class="grid-ships-player">
 						<div id="player-grid" class="grid-stack grid-stack-10"></div>
 					</div>
-					<div id="finish-placing-button"></div>
-					<div class="text-center"><small id="alert-text"></small></div>
 					<div id="ship-counter"></div>
-					<div id="ship-history"></div>
 				</div>
-
 				<!-- Grilla del oponente -->
 				<div id="opponent-ship-box" class="col">
-					<h5 class="text-center mt-2 text-danger">Opponent Ships</h5>
+					<h5 class="text-center text-light">Opponent Ships</h5>
 					<div id="grid-ships-opponent" class="grid-ships-opponent" class="col">
 						<div id="opponent-grid" class="grid-stack grid-stack-10"></div>
 					</div>
-					<div id="finish-salvoes-button"></div>
-					<div class="text-center"><small id="salvoes-text"></small></div>
-
 				</div>
-
 			</div>
 		</div>
 	</div>
