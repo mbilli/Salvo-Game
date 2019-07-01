@@ -173,7 +173,7 @@ public class SalvoController {
         }  else if (gamePlayerState != GamePlayerState.ENTER_SALVO) {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "You can not fire at this moment"), HttpStatus.FORBIDDEN);
         } else if (!gamePlayer.checkLocation(salvo.getSalvoLocation())) {
-            messageResponse = new ResponseEntity<>(makeMap("forbidden", "The Locations are not allowed"), HttpStatus.FORBIDDEN);
+            messageResponse = new ResponseEntity<>(makeMap("forbidden", "The locations are not allowed"), HttpStatus.FORBIDDEN);
         } else {
           gamePlayer.addSalvo(salvo);
           gamePlayerRepository.save(gamePlayer);

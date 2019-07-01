@@ -44,9 +44,9 @@
 					<img class="radar-image" src="images/radar.gif">
 					<div class="text-center">
 						<h5 class="text-light">Game Information</h5>
-						<button class="select-grid-button" onclick="changeGridView('player')">Your ships</button>
-						<button class="select-grid-button" onclick="changeGridView('opponent')">Enemy's ships</button>
-						<button class="select-grid-button" onclick="changeGridView('both')">Both</button>
+						<button id="show-your-ships-button" class="select-grid-button select-grid-button-selected" onclick="changeGridView('player')">Your ships</button>
+						<button id="show-enemy-ships-button" class="select-grid-button" onclick="changeGridView('opponent')">Enemy's ships</button>
+						<button id="show-both-ships-button" class="select-grid-button" onclick="changeGridView('both')">Both</button>
 					</div>
 					<div class="row">
 						<div class="col-12 col-sd-7">
@@ -72,7 +72,7 @@
 				<!-- Area de juego -->
 				<!-- Grilla del jugador -->
 				<div id="player-ship-box" class="col">
-					<h5 class="text-center text-light">Your Ships</h5>
+					<h5 class="text-center text-light">Your Ships <i class="fa fa-ship" aria-hidden="true"></i></h5>
 					<div class="grid-ships-player">
 						<div id="player-grid" class="grid-stack grid-stack-10"></div>
 					</div>
@@ -80,7 +80,7 @@
 				</div>
 				<!-- Grilla del oponente -->
 				<div id="opponent-ship-box" class="col">
-					<h5 class="text-center text-light">Opponent Ships</h5>
+					<h5 class="text-center text-light">Opponent Ships <i class="fa fa-dot-circle-o" aria-hidden="true"></i></h5>
 					<div id="grid-ships-opponent" class="grid-ships-opponent" class="col">
 						<div id="opponent-grid" class="grid-stack grid-stack-10"></div>
 					</div>

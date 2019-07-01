@@ -29,6 +29,7 @@ var logInError = document.getElementById("login-error");
 var signUpError = document.getElementById("signup-error");
 var playerName = document.getElementById("player-name");
 var createGameButton = document.getElementById("create-game-button");
+var gameListSelectHTML = document.getElementById("game-list-select");
 
 
 // Traigo los datos del backend, calcula leaderboard e imprime el html
@@ -144,6 +145,7 @@ function leaderboardSorted(leaderboard) {
 function populateGameList(myJson) {
 	gameList.innerHTML = "";
 	myJson.forEach(game => {
+		let printGame = 0;
 		let gameDate = new Date(game.created);
 		let playersEmail = game.gamePlayers.map(gamePlayer => (gamePlayer.player.email));
 		// Variable que indica si un juego tiene un gameplayer perteneciente al jugador actual
@@ -151,6 +153,27 @@ function populateGameList(myJson) {
 		// defino el html de la lista sin <li></li>
 		let gameHTML = "GAME ID:" + game.gameId + " - CREATED: " + gameDate.toLocaleString() +
 			" - PLAYERS: " + playersEmail.join(", ");
+		//Imprimo los juegos dependiendo del valor del select
+		switch (gameListSelectHTML.value) {
+			case "finished":
+				if (game.finished) {
+					printGame = 1;
+				}
+				break;
+			case "join":
+				if (game.gamePlayers.length < 2 && !playerJson) {
+					printGame = 1;
+				}
+				break;
+			case "active":
+				if (!game.finished) {
+					printGame = 1;
+				}
+				break;
+			case "all":
+				printGame = 1;
+		}
+
 		// Si terminó, agrego la fecha de finalización
 		if (game.finished) {
 			let finishedDate = new Date(game.finished);
@@ -168,15 +191,23 @@ function populateGameList(myJson) {
 			// Si pertenece, agrego el link para unirse al gameplayer
 			if (playersGamePlayer) {
 				gameHTML = "<a href='game.html?gp=" + playersGamePlayer + "' class='join-game-link'>" + gameHTML + "</a>";
+				if (gameListSelectHTML.value == "my-games") {
+					printGame = 1;
+				}
 			}
-			// Si el juego no esta lleno y no el jugador aún no participa, agrego el botón de join
+			// Si el juego no esta lleno y el jugador aún no participa, agrego el botón de join
 			if (game.gamePlayers.length < 2 && !playersGamePlayer) {
 				gameHTML += "<button onclick='joinAGame(" + game.gameId + ")' class='join-game-button'>Join Game ";
 				gameHTML += "<i class='fa fa-user-plus' aria-hidden='true'></i></button>";
+				if (gameListSelectHTML.value == "join") {
+					printGame = 1;
+				}
 			}
 		}
-		// Agrego la lista al html con <li></li>
-		gameList.innerHTML += "<li class='list-group-item'>" + gameHTML + "</li>";
+		if (printGame) {
+			// Agrego la lista al html con <li></li>
+			gameList.innerHTML += "<li class='list-group-item'>" + gameHTML + "</li>";
+		}
 	});
 }
 
@@ -376,6 +407,7 @@ function showSignUpPassword() {
 		signUpPassword.type = "password";
 	}
 }
+
 
 /*********************************************************
  ** Render Functions

@@ -78,6 +78,9 @@ var mainBody = document.getElementById("main-body");
 var playerShipBoxHTML = document.getElementById("player-ship-box");
 var opponentShipBoxHTML = document.getElementById("opponent-ship-box");
 var controlsConsoleHTML = document.getElementById("controls-console");
+var showYourShipsButtonHTML = document.getElementById("show-your-ships-button");
+var showEnemyShipsButtonHTML = document.getElementById("show-enemy-ships-button");
+var showBothShipsButtonHTML = document.getElementById("show-both-ships-button");
 
 
 // Cargo la grilla, traigo los datos del backend e imprimo todo
@@ -98,8 +101,8 @@ $(() => {
 			printSalvoes(gameJson.salvoes);
 		}
 		// Muestro la página
-		htmlRender();
 		updateFromBackend();
+		htmlRender();
 	}).catch(function (error) {
 		// called when an error occurs anywhere in the chain
 		alert("Request failed: " + error);
@@ -228,27 +231,32 @@ function htmlRender() {
 				break;
 			case gameStateEnum.enterSalvo:
 				gameStateHTML.innerHTML = "Enter your salvo";
-				setTimeout(function() { changeGridView("opponent"); }, 2000);
+				setTimeout(function() { changeGridView("opponent"); }, 1000);
 				startSelectingSalvoes();
 				break;
 			case gameStateEnum.waitOpponentSalvo:
 				gameStateHTML.innerHTML = "Waiting opponent's salvos";
-				setTimeout(function() { changeGridView("player"); }, 2000);
+				setTimeout(function() { changeGridView("player"); }, 1000);
 				break;
 			case gameStateEnum.gameOverWon:
 				gameStateHTML.innerHTML = "Game over: You won";
 				salvoHistory.innerHTML = "GAME OVER: YOU WON <br> let's celebrate";
 				changeGridView("both");
+				stopUpdateFromBackend();
+				document.getElementById("back-img").src = "images/win-image.jpg";
 				break;
 			case gameStateEnum.gameOverLost:
 				gameStateHTML.innerHTML = "Game over: You lost";
 				salvoHistory.innerHTML = "GAME OVER: YOU LOST <br> looser!!!";
 				changeGridView("both");
+				stopUpdateFromBackend();
+				document.getElementById("back-img").src = "images/lost-image.jpg";
 				break;
 			case gameStateEnum.gamOverTied:
 				gameStateHTML.innerHTML = "Game over: Tied";
 				salvoHistory.innerHTML = "GAME OVER: TIE <br> such a boring game";
 				changeGridView("both");
+				stopUpdateFromBackend();
 				break;
 			case gameStateEnum.unknown:
 				gameStateHTML.innerHTML = "There have been some problems, probably is your fault!!!";
@@ -277,14 +285,23 @@ function changeGridView(gridSelected) {
 		playerShipBoxHTML.style.display = "block";
 		opponentShipBoxHTML.style.display = "none";
 		controlsConsoleHTML.classList.add("col-lg");
+		showYourShipsButtonHTML.classList.add("select-grid-button-selected");
+		showEnemyShipsButtonHTML.classList.remove("select-grid-button-selected");
+		showBothShipsButtonHTML.classList.remove("select-grid-button-selected");
 	} else if (gridSelected == "opponent") {
 		playerShipBoxHTML.style.display = "none";
 		opponentShipBoxHTML.style.display = "block";
 		controlsConsoleHTML.classList.add("col-lg");
+		showYourShipsButtonHTML.classList.remove("select-grid-button-selected");
+		showEnemyShipsButtonHTML.classList.add("select-grid-button-selected");
+		showBothShipsButtonHTML.classList.remove("select-grid-button-selected");
 	} else if (gridSelected == "both") {
 		playerShipBoxHTML.style.display = "block";
 		opponentShipBoxHTML.style.display = "block";
 		controlsConsoleHTML.classList.remove("col-lg");
+		showYourShipsButtonHTML.classList.remove("select-grid-button-selected");
+		showEnemyShipsButtonHTML.classList.remove("select-grid-button-selected");
+		showBothShipsButtonHTML.classList.add("select-grid-button-selected");
 	}
 }
 

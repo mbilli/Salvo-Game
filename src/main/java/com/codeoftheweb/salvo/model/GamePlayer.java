@@ -14,6 +14,7 @@ public class GamePlayer {
   @GenericGenerator(name = "native", strategy = "native")
   private long id;
   private LocalDateTime creationDate;
+  private GamePlayerTeams team;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "player_id")
@@ -32,12 +33,14 @@ public class GamePlayer {
   // Constructors
   public GamePlayer() {
     this.creationDate = LocalDateTime.now();
+    this.team = GamePlayerTeams.NO_SELECTED;
   }
 
   public GamePlayer(Player player, Game game) {
     this.player = player;
     this.game = game;
     this.creationDate = LocalDateTime.now();
+    this.team = GamePlayerTeams.NO_SELECTED;
   }
 
   // setters and getters
@@ -88,6 +91,14 @@ public class GamePlayer {
 
   public void setGame(Game game) {
     this.game = game;
+  }
+
+  public GamePlayerTeams getTeam() {
+    return team;
+  }
+
+  public void setTeam(GamePlayerTeams team) {
+    this.team = team;
   }
 
   // Methods
@@ -199,6 +210,7 @@ public class GamePlayer {
       dto.put("sinkShips", this.isSink(opponentGP.getShips(), this.getSalvoes()).stream().map(Ship::makeDTO));
     }
     dto.put("gamePlayerState", this.getGamePlayerState());
+    dto.put("team", this.getTeam());
     return dto;
   }
 }

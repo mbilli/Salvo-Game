@@ -18,6 +18,17 @@
 
 		<div id="main-body">
 
+			<div id="select-team" class="text-center">
+				<h4 class="">Select a Team <i class="fa fa-flag" aria-hidden="true"></i></h4>
+				<div class="row">
+					<div class="col"><img class="select-team-flag" src="images/france%20flag.jpg"><h6>FRANCE</h6></div>
+					<div class="col"><img class="select-team-flag" src="images/usa%20flag.jpg"><h6>USA</h6></div>
+					<div class="col"><img class="select-team-flag" src="images/urrs%20flag.jpg"><h6>URRS</h6></div>
+					<div class="col"><img class="select-team-flag" src="images/germany%20flag.jpg"><h6>GERMANY</h6></div>
+				</div>
+				<button onclick="document.getElementById('select-team').style.display = 'none'">Cancel</button>
+			</div>
+
 			<video autoplay muted loop id="back-video">
 				<source src="images/video-back.mp4" type="video/mp4">
 			</video>
@@ -112,7 +123,7 @@
 			<h3 class="mt-3 text-danger">List of games</h3>
 			<div class="row">
 				<div id="create-game-button" class="col-auto"></div>
-				<select name="game-list" id="game-list-select" class="col-auto">
+				<select name="game-list" id="game-list-select" class="col-auto" onchange="populateGameList(gameJson)">
 					<option value="active" selected>Show active games</option>
 					<option value="all">Show All</option>
 					<option value="my-games">Show my games</option>

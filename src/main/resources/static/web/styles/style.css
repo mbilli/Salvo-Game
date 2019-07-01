@@ -39,6 +39,30 @@ body {
 	opacity: 0.6;
 	z-index: -9;
 }
+#select-team {
+	position: fixed;
+	padding: 30px;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 9;
+	background-color: rgba(255,255,255,0.7);
+	border-radius: 15px;
+}
+#select-team img {
+	height: 100px;
+	width: 200px;
+	margin: 10px;
+}
+#select-team button {
+	border-radius: 5px;
+	border: 1px solid white;
+	background-color: black;
+	color: white;
+	margin: 5px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
 
 #game-list-select {
 	border-radius: 5px;
@@ -243,13 +267,18 @@ body {
 }
 
 .select-grid-button {
-	width: 120px;
+	width: 90px;
 	margin-bottom: 15px;
 	border-radius: 5px;
 	border: 1px solid white;
 	color: white;
 	background-color: black;
 	font-weight: bold;
+	font-size: 11px;
+}
+.select-grid-button-selected {
+	background-color: white;
+	color: black;
 }
 
 #finish-placing-button,
@@ -273,7 +302,7 @@ body {
 	color: white;
 	padding: 5px;
 	margin-top: 5px;
-	text-align: center
+	text-align: center;
 }
 
 #game-list::-webkit-scrollbar {
