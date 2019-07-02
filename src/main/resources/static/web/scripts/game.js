@@ -10,6 +10,12 @@ var generalTimerId;
 var gamePlayerState = "";
 const urlParams = new URLSearchParams(location.search);
 const gamePlayerParam = urlParams.get('gp');
+const gameTeamsEnum = {
+	USA: "USA",
+	URRS: "URRS",
+	GERMANY: "GERMANY",
+	FRANCE: "FRANCE"
+};
 const typesOfShip = {
 	carrier: {
 		name: "Carrier",
@@ -183,9 +189,11 @@ function assignPlayers() {
 		if (gp.gamePlayerId == gamePlayerParam) {
 			player1.username = gp.player.email;
 			player1.id = gp.player.playerId;
+			player1.team = gp.team;
 		} else {
 			opponent1.username = gp.player.email;
 			opponent1.id = gp.player.playerId;
+			opponent1.team = gp.team;
 		}
 	});
 	document.getElementById("player-name").innerHTML = 'Hello <strong>' + player1.username + '</strong>';
@@ -200,8 +208,8 @@ function printPlayers() {
 	}
 
 	// escribo en el dom
-	playersId.innerHTML = player1.username + " (you) vs ";
-	playersId.innerHTML += opponent1.username;
+	playersId.innerHTML = player1.username + "<img class='flags-list' src='images/" + player1.team + "%20flag.jpg'> vs ";
+	playersId.innerHTML += opponent1.username + "<img class='flags-list' src='images/" + opponent1.team + "%20flag.jpg'>";
 }
 
 /*********************************************************

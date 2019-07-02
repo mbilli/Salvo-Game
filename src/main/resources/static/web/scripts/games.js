@@ -10,6 +10,14 @@ var init = {
 let gameJson, playerJson;
 // contiene los datos calculados de los partidos en un array de jugadores
 let leaderboardJson = [];
+const gameTeamsEnum = {
+	USA: "USA",
+	URRS: "URRS",
+	GERMANY: "GERMANY",
+	FRANCE: "FRANCE"
+};
+var createNotJoin = null;
+var gameIdForJoin = null;
 
 var gameList = document.getElementById("game-list");
 var leaderboardTable = document.getElementById("leaderboard-table-data");
@@ -30,6 +38,20 @@ var signUpError = document.getElementById("signup-error");
 var playerName = document.getElementById("player-name");
 var createGameButton = document.getElementById("create-game-button");
 var gameListSelectHTML = document.getElementById("game-list-select");
+var selectTeamHTML = document.getElementById("select-team");
+
+document.getElementById("usa-flag").addEventListener("click", function () {
+	createJoinGame(createNotJoin, gameIdForJoin, gameTeamsEnum.USA);
+});
+document.getElementById("urrs-flag").addEventListener("click", function () {
+	createJoinGame(createNotJoin, gameIdForJoin, gameTeamsEnum.URRS);
+});
+document.getElementById("france-flag").addEventListener("click", function () {
+	createJoinGame(createNotJoin, gameIdForJoin, gameTeamsEnum.FRANCE);
+});
+document.getElementById("germany-flag").addEventListener("click", function () {
+	createJoinGame(createNotJoin, gameIdForJoin, gameTeamsEnum.GERMANY);
+});
 
 
 // Traigo los datos del backend, calcula leaderboard e imprime el html
@@ -147,12 +169,13 @@ function populateGameList(myJson) {
 	myJson.forEach(game => {
 		let printGame = 0;
 		let gameDate = new Date(game.created);
-		let playersEmail = game.gamePlayers.map(gamePlayer => (gamePlayer.player.email));
+		let playersEmail = game.gamePlayers.map(gamePlayer => ({email:gamePlayer.player.email, team:gamePlayer.team}));
 		// Variable que indica si un juego tiene un gameplayer perteneciente al jugador actual
 		let playersGamePlayer = null;
 		// defino el html de la lista sin <li></li>
 		let gameHTML = "GAME ID:" + game.gameId + " - CREATED: " + gameDate.toLocaleString() +
-			" - PLAYERS: " + playersEmail.join(", ");
+			" - PLAYERS: " + playersEmail.map(player => {return player.email + "<img class='flags-list' src='images/" + player.team + "%20flag.jpg'>"}).join(" vs ");
+		
 		//Imprimo los juegos dependiendo del valor del select
 		switch (gameListSelectHTML.value) {
 			case "finished":
@@ -197,7 +220,7 @@ function populateGameList(myJson) {
 			}
 			// Si el juego no esta lleno y el jugador aún no participa, agrego el botón de join
 			if (game.gamePlayers.length < 2 && !playersGamePlayer) {
-				gameHTML += "<button onclick='joinAGame(" + game.gameId + ")' class='join-game-button'>Join Game ";
+				gameHTML += "<button onclick='showSelectTeam(0, " + game.gameId + ")' class='join-game-button'>Join Game ";
 				gameHTML += "<i class='fa fa-user-plus' aria-hidden='true'></i></button>";
 				if (gameListSelectHTML.value == "join") {
 					printGame = 1;
@@ -340,8 +363,10 @@ function eraseFields() {
 /*********************************************************
  ** Función que crea un juego nuevo
  *********************************************************/
-function createNewGame() {
-	$.post("/api/games")
+function createNewGame(teamValue) {
+	$.post("/api/games", {
+			team: teamValue
+		})
 		.done(function (response) {
 			console.log("Game created (ID = " + response.gamePlayerId + ")");
 			window.location.href = "/web/game.html?gp=" + response.gamePlayerId;
@@ -356,8 +381,10 @@ function createNewGame() {
  ** Función que une un jugador con un juego existente
  ** Recibe el ID del juego al que debe unirse
  *********************************************************/
-function joinAGame(gameId) {
-	$.post("/api/games/" + gameId + "/players")
+function joinAGame(gameId, teamValue) {
+	$.post("/api/games/" + gameId + "/players", {
+			team: teamValue
+		})
 		.done(function (response) {
 			window.location.href = "/web/game.html?gp=" + response.gamePlayerId;
 		})
@@ -408,6 +435,39 @@ function showSignUpPassword() {
 	}
 }
 
+/*********************************************************
+ ** Permite seleccionar el equipo con el que se juega
+ ** Recibe dos parameros:
+ ** createNotJoin -> 1 si se crea un juego y 0 si se une a uno
+ ** gameId -> solo necesario si se une a un juego
+ *********************************************************/
+function showSelectTeam(create, gameId) {
+	document.getElementById("usa-flag").style.display = "inline";
+	document.getElementById("urrs-flag").style.display = "inline";
+	document.getElementById("germany-flag").style.display = "inline";
+	document.getElementById("france-flag").style.display = "inline";
+	
+	if (create !== null) {
+		createNotJoin = create;
+		gameIdForJoin = gameId;
+		selectTeamHTML.style.display = "inherit";
+		if (!create) {
+			let gamePlayerOpTeam = gameJson.filter(game => game.gameId == gameId)[0].gamePlayers[0].team;
+			document.getElementById(gamePlayerOpTeam.toLocaleLowerCase() + "-flag").style.display = "none";
+		}
+	} else {
+		createNotJoin = null;
+		gameIdForJoin = null;
+		selectTeamHTML.style.display = "none";
+	}
+}
+function createJoinGame(create, gameId, team) {
+	if (create && team !== null) {
+		createNewGame(team);
+	} else if (!create && gameId !== null && team !== null) {
+		joinAGame(gameId, team);
+	}
+}
 
 /*********************************************************
  ** Render Functions
@@ -418,11 +478,12 @@ function htmlRender() {
 		logInSignUpPanel.style.display = "none";
 		logOutPanel.style.display = "block";
 		playerName.innerHTML = 'Hello <strong>' + playerJson.email + '</strong>';
-		createGameButton.innerHTML = '<button onclick="createNewGame()" class="create-game-button">New game</button>';
+		createGameButton.innerHTML = '<button onclick="showSelectTeam(1, null)" class="create-game-button">New game</button>';
 	} else if (logInSignUpPanel.style.display == "none") {
 		logOutPanel.style.display = "none";
 		logInSignUpPanel.style.display = "block";
 		createGameButton.innerHTML = "";
+		showSelectTeam(null, null);
 	}
 	// armo la tabla de posiciones
 	populateLeaderboardTable();

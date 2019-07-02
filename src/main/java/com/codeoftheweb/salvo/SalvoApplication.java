@@ -47,20 +47,20 @@ public class SalvoApplication {
       Game game8 = gameRepository.save(new Game(LocalDateTime.now().plusHours(7)));
 
       // Bind players to Games
-      GamePlayer gameplayer1 = new GamePlayer(jBauer, game1);
-      GamePlayer gameplayer2 = new GamePlayer(cObrian, game1);
-      GamePlayer gameplayer3 = new GamePlayer(jBauer, game2);
-      GamePlayer gameplayer4 = new GamePlayer(cObrian, game2);
-      GamePlayer gameplayer5 = new GamePlayer(cObrian, game3);
-      GamePlayer gameplayer6 = new GamePlayer(tAlmeida, game3);
-      GamePlayer gameplayer7 = new GamePlayer(cObrian, game4);
-      GamePlayer gameplayer8 = new GamePlayer(jBauer, game4);
-      GamePlayer gameplayer9 = new GamePlayer(tAlmeida, game5);
-      GamePlayer gameplayer10 = new GamePlayer(jBauer, game5);
-      GamePlayer gameplayer11 = new GamePlayer(kBauer, game6);
-      GamePlayer gameplayer12 = new GamePlayer(tAlmeida, game7);
-      GamePlayer gameplayer13 = new GamePlayer(kBauer, game8);
-      GamePlayer gameplayer14 = new GamePlayer(tAlmeida, game8);
+      GamePlayer gameplayer1 = new GamePlayer(jBauer, game1, GamePlayerTeams.FRANCE);
+      GamePlayer gameplayer2 = new GamePlayer(cObrian, game1, GamePlayerTeams.GERMANY);
+      GamePlayer gameplayer3 = new GamePlayer(jBauer, game2, GamePlayerTeams.URRS);
+      GamePlayer gameplayer4 = new GamePlayer(cObrian, game2, GamePlayerTeams.FRANCE);
+      GamePlayer gameplayer5 = new GamePlayer(cObrian, game3, GamePlayerTeams.USA);
+      GamePlayer gameplayer6 = new GamePlayer(tAlmeida, game3, GamePlayerTeams.GERMANY);
+      GamePlayer gameplayer7 = new GamePlayer(cObrian, game4, GamePlayerTeams.URRS);
+      GamePlayer gameplayer8 = new GamePlayer(jBauer, game4, GamePlayerTeams.FRANCE);
+      GamePlayer gameplayer9 = new GamePlayer(tAlmeida, game5, GamePlayerTeams.USA);
+      GamePlayer gameplayer10 = new GamePlayer(jBauer, game5, GamePlayerTeams.GERMANY);
+      GamePlayer gameplayer11 = new GamePlayer(kBauer, game6, GamePlayerTeams.USA);
+      GamePlayer gameplayer12 = new GamePlayer(tAlmeida, game7, GamePlayerTeams.URRS);
+      GamePlayer gameplayer13 = new GamePlayer(kBauer, game8, GamePlayerTeams.GERMANY);
+      GamePlayer gameplayer14 = new GamePlayer(tAlmeida, game8, GamePlayerTeams.FRANCE);
 
       // Create some Ships
       Ship ship1 = new Ship("Destroyer", Arrays.asList("H2", "H3", "H4"));

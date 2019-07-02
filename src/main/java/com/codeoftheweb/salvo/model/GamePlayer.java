@@ -43,6 +43,13 @@ public class GamePlayer {
     this.team = GamePlayerTeams.NO_SELECTED;
   }
 
+  public GamePlayer(Player player, Game game, GamePlayerTeams gamePlayerTeam) {
+    this.player = player;
+    this.game = game;
+    this.creationDate = LocalDateTime.now();
+    this.team = gamePlayerTeam;
+  }
+
   // setters and getters
   public LocalDateTime getCreationDate() {
     return creationDate;
@@ -187,6 +194,7 @@ public class GamePlayer {
     Map<String, Object> dto = new LinkedHashMap<String, Object>();
     dto.put("gamePlayerId", this.id);
     dto.put("player", this.player.makeDTO());
+    dto.put("team", this.getTeam());
     if(this.player.getScore(this.getGame()) != null)
       dto.put("score", this.player.getScore(this.getGame()).getScore());
     else

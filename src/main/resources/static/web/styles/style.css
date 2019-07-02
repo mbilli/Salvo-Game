@@ -41,12 +41,13 @@ body {
 }
 #select-team {
 	position: fixed;
+	display: none;
 	padding: 30px;
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%, -50%);
 	z-index: 9;
-	background-color: rgba(255,255,255,0.7);
+	background-color: rgba(255,255,255,0.8);
 	border-radius: 15px;
 }
 #select-team img {
@@ -54,6 +55,16 @@ body {
 	width: 200px;
 	margin: 10px;
 }
+#select-team img:hover {
+	transform: scale(1.1);
+}
+
+.flags-list {
+	height: 17px;
+	width: 34px;
+	margin: 0px 10px;
+}
+
 #select-team button {
 	border-radius: 5px;
 	border: 1px solid white;

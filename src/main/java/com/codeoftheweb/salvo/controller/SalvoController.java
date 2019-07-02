@@ -46,7 +46,7 @@ public class SalvoController {
   }
 
   @RequestMapping(value = "/games", method = RequestMethod.POST)
-  public ResponseEntity<Map<String, Object>> createGame(Authentication authentication) {
+  public ResponseEntity<Map<String, Object>> createGame(@RequestParam GamePlayerTeams team, Authentication authentication) {
     ResponseEntity messageResponse;
     if(isGuest(authentication)) {
       messageResponse = new ResponseEntity<>(makeMap("unauthorized", "You must be logged"), HttpStatus.UNAUTHORIZED);
@@ -54,6 +54,7 @@ public class SalvoController {
       Game game = gameRepository.save(new Game());
       Player player = playerRepository.findByUserName(authentication.getName());
       GamePlayer gameplayer = new GamePlayer(player, game);
+      gameplayer.setTeam(team);
       gamePlayerRepository.save(gameplayer);
       messageResponse = new ResponseEntity<>(makeMap("gamePlayerId", gameplayer.getId()), HttpStatus.CREATED);
     }
@@ -61,7 +62,8 @@ public class SalvoController {
   }
 
   @RequestMapping(value = "/games/{gameId}/players", method = RequestMethod.POST)
-  public ResponseEntity<Map<String, Object>> joinGame(@PathVariable Long gameId, Authentication authentication) {
+  public ResponseEntity<Map<String, Object>> joinGame(@PathVariable Long gameId, @RequestParam GamePlayerTeams team
+          , Authentication authentication) {
     ResponseEntity messageResponse;
     if(isGuest(authentication)) {
       messageResponse = new ResponseEntity<>(makeMap("unauthorized", "You must be logged"), HttpStatus.UNAUTHORIZED);
@@ -77,6 +79,7 @@ public class SalvoController {
           messageResponse = new ResponseEntity<>(makeMap("forbidden", "You are already in this game"), HttpStatus.FORBIDDEN);
         } else {
           GamePlayer gameplayer = new GamePlayer(player, game);
+          gameplayer.setTeam(team);
           gamePlayerRepository.save(gameplayer);
           messageResponse = new ResponseEntity<>(makeMap("gamePlayerId", gameplayer.getId()), HttpStatus.CREATED);
         }
