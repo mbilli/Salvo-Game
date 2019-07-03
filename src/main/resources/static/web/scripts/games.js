@@ -179,7 +179,7 @@ function populateGameList(myJson) {
 		// defino el html de la lista sin <li></li>
 		let gameHTML = "GAME ID:" + game.gameId + " - CREATED: " + gameDate.toLocaleString() +
 			" - PLAYERS: " + playersEmail.map(player => {
-				return player.email + "<img class='flags-list' src='images/" + player.team + "-flag.jpg'>"
+				return player.email + "<img class='flags-list' src='images/" + player.team.toLocaleLowerCase() + "-flag.jpg'>"
 			}).join(" vs ");
 
 		//Imprimo los juegos dependiendo del valor del select

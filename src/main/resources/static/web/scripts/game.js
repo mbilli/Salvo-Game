@@ -210,8 +210,8 @@ function printPlayers() {
 	}
 
 	// escribo en el dom
-	playersId.innerHTML = player1.username + "<img class='flags-list' src='images/" + player1.team + "-flag.jpg'> vs ";
-	playersId.innerHTML += opponent1.username + "<img class='flags-list' src='images/" + opponent1.team + "-flag.jpg'>";
+	playersId.innerHTML = player1.username + "<img class='flags-list' src='images/" + player1.team.toLocaleLowerCase() + "-flag.jpg'> vs ";
+	playersId.innerHTML += opponent1.username + "<img class='flags-list' src='images/" + opponent1.team.toLocaleLowerCase() + "-flag.jpg'>";
 }
 
 /*********************************************************
