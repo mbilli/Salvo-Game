@@ -70,6 +70,7 @@ var init = {
 var playersId = document.getElementById("players");
 var gameStateHTML = document.getElementById("game-state");
 var gameTurnHTML = document.getElementById("game-turn");
+var gameIdHTML = document.getElementById("game-id");
 var logOutPanelHTML = document.getElementById("logout-panel");
 var finishPlacingButtonHTML = document.getElementById("finish-placing-button");
 var finishSalvoesButtonHTML = document.getElementById("finish-salvoes-button");
@@ -109,6 +110,7 @@ $(() => {
 		// Muestro la página
 		updateFromBackend();
 		htmlRender();
+		gameIdHTML.innerHTML = gameJson.gameId;
 	}).catch(function (error) {
 		// called when an error occurs anywhere in the chain
 		alert("Request failed: " + error);
@@ -248,21 +250,21 @@ function htmlRender() {
 				break;
 			case gameStateEnum.gameOverWon:
 				gameStateHTML.innerHTML = "Game over: You won";
-				salvoHistory.innerHTML = "GAME OVER: YOU WON <br> let's celebrate";
+				salvoHistory.innerHTML = "<div class='end-game'><img src='images/game-won.jpg'></div><h5 class='text-white mt-1'>GAME OVER: YOU WON <br> let's celebrate <i class='fa fa-trophy' aria-hidden='true'></i></h5>";
 				changeGridView("both");
 				stopUpdateFromBackend();
 				document.getElementById("back-img").src = "images/win-image.jpg";
 				break;
 			case gameStateEnum.gameOverLost:
 				gameStateHTML.innerHTML = "Game over: You lost";
-				salvoHistory.innerHTML = "GAME OVER: YOU LOST <br> looser!!!";
+				salvoHistory.innerHTML = "<div class='end-game'><img src='images/game-lost.jpg'></div><h5 class='text-white mt-1'>GAME OVER: YOU LOST <br> looser!!! <i class='fa fa-thumbs-down' aria-hidden='true'></i></h5>";
 				changeGridView("both");
 				stopUpdateFromBackend();
 				document.getElementById("back-img").src = "images/lost-image.jpg";
 				break;
 			case gameStateEnum.gamOverTied:
 				gameStateHTML.innerHTML = "Game over: Tied";
-				salvoHistory.innerHTML = "GAME OVER: TIE <br> such a boring game";
+				salvoHistory.innerHTML = "<div class='end-game'><img src='images/game-tied.jpg'></div><h5 class='text-white mt-1'>GAME OVER: TIE <br> such a boring game</h5>";
 				changeGridView("both");
 				stopUpdateFromBackend();
 				break;

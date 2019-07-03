@@ -39,6 +39,7 @@ var playerName = document.getElementById("player-name");
 var createGameButton = document.getElementById("create-game-button");
 var gameListSelectHTML = document.getElementById("game-list-select");
 var selectTeamHTML = document.getElementById("select-team");
+var backOverlayHTML = document.getElementById("back-overlay");
 
 document.getElementById("usa-flag").addEventListener("click", function () {
 	createJoinGame(createNotJoin, gameIdForJoin, gameTeamsEnum.USA);
@@ -169,13 +170,18 @@ function populateGameList(myJson) {
 	myJson.forEach(game => {
 		let printGame = 0;
 		let gameDate = new Date(game.created);
-		let playersEmail = game.gamePlayers.map(gamePlayer => ({email:gamePlayer.player.email, team:gamePlayer.team}));
+		let playersEmail = game.gamePlayers.map(gamePlayer => ({
+			email: gamePlayer.player.email,
+			team: gamePlayer.team
+		}));
 		// Variable que indica si un juego tiene un gameplayer perteneciente al jugador actual
 		let playersGamePlayer = null;
 		// defino el html de la lista sin <li></li>
 		let gameHTML = "GAME ID:" + game.gameId + " - CREATED: " + gameDate.toLocaleString() +
-			" - PLAYERS: " + playersEmail.map(player => {return player.email + "<img class='flags-list' src='images/" + player.team + "%20flag.jpg'>"}).join(" vs ");
-		
+			" - PLAYERS: " + playersEmail.map(player => {
+				return player.email + "<img class='flags-list' src='images/" + player.team + "%20flag.jpg'>"
+			}).join(" vs ");
+
 		//Imprimo los juegos dependiendo del valor del select
 		switch (gameListSelectHTML.value) {
 			case "finished":
@@ -352,12 +358,17 @@ function playerSignOut() {
  ** Función de borra los campos de log in y log out
  *********************************************************/
 function eraseFields() {
-	signUpEmail.value = "";
-	signUpPassword.value = "";
-	logInEmail.value = "";
-	logInPassword.value = "";
-	logInForm.style.display = "none";
-	signUpForm.style.display = "none";
+	if (!playerJson) {
+		signUpEmail.value = "";
+		signUpPassword.value = "";
+		logInEmail.value = "";
+		logInPassword.value = "";
+		logInForm.style.display = "none";
+		signUpForm.style.display = "none";
+		backOverlayHTML.classList.remove("back-overlay");
+	} else {
+		showSelectTeam(null, null);
+	}
 }
 
 /*********************************************************
@@ -402,8 +413,10 @@ function showHideLogIn() {
 	if (logInForm.style.display != "block") {
 		logInForm.style.display = "block";
 		signUpForm.style.display = "none";
+		backOverlayHTML.classList.add("back-overlay");
 	} else {
 		logInForm.style.display = "none";
+		backOverlayHTML.classList.remove("back-overlay");
 	}
 }
 
@@ -412,8 +425,10 @@ function showHideSignUp() {
 	if (signUpForm.style.display != "block") {
 		signUpForm.style.display = "block";
 		logInForm.style.display = "none";
+		backOverlayHTML.classList.add("back-overlay");
 	} else {
 		signUpForm.style.display = "none";
+		backOverlayHTML.classList.remove("back-overlay");
 	}
 }
 
@@ -446,8 +461,9 @@ function showSelectTeam(create, gameId) {
 	document.getElementById("urrs-flag").style.display = "inline";
 	document.getElementById("germany-flag").style.display = "inline";
 	document.getElementById("france-flag").style.display = "inline";
-	
+
 	if (create !== null) {
+		backOverlayHTML.classList.add("back-overlay");
 		createNotJoin = create;
 		gameIdForJoin = gameId;
 		selectTeamHTML.style.display = "inherit";
@@ -459,13 +475,19 @@ function showSelectTeam(create, gameId) {
 		createNotJoin = null;
 		gameIdForJoin = null;
 		selectTeamHTML.style.display = "none";
+		backOverlayHTML.classList.remove("back-overlay");
 	}
 }
+
 function createJoinGame(create, gameId, team) {
 	if (create && team !== null) {
 		createNewGame(team);
+		selectTeamHTML.style.display = "none";
+		backOverlayHTML.classList.remove("back-overlay");
 	} else if (!create && gameId !== null && team !== null) {
 		joinAGame(gameId, team);
+		selectTeamHTML.style.display = "none";
+		backOverlayHTML.classList.remove("back-overlay");
 	}
 }
 
