@@ -551,7 +551,7 @@ function printSalvoes(salvoesForPrint) {
 			salvoesByTurn.locations.map(function (salvo) {
 				// Asigno x e y
 				y0 = yGridLetters.indexOf(salvo[0]);
-				x0 = parseInt(salvo[1]) - 1;
+				x0 = parseInt(salvo.slice(1)) - 1;
 				cellId = x0 + (y0 * cellSize.width); // calculo el Id de la celda
 				if (cellId < 10) {
 					cellId = "0" + cellId; // si es menor que 10, uso formato 0X
