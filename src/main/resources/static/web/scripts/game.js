@@ -207,6 +207,7 @@ function assignPlayers() {
 function printPlayers() {
 	if (!opponent1.username) {
 		opponent1.username = "<span class='text-danger'>Waiting your opponent</span>";
+		opponent1.team = "undefined";
 	}
 
 	// escribo en el dom
