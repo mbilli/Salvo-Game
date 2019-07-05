@@ -242,12 +242,16 @@ function htmlRender() {
 				break;
 			case gameStateEnum.enterSalvo:
 				gameStateHTML.innerHTML = "Enter your salvo";
-				setTimeout(function() { changeGridView("opponent"); }, 1000);
+				setTimeout(function () {
+					changeGridView("opponent");
+				}, 1000);
 				startSelectingSalvoes();
 				break;
 			case gameStateEnum.waitOpponentSalvo:
 				gameStateHTML.innerHTML = "Waiting opponent's salvos";
-				setTimeout(function() { changeGridView("player"); }, 1000);
+				setTimeout(function () {
+					changeGridView("player");
+				}, 1000);
 				break;
 			case gameStateEnum.gameOverWon:
 				gameStateHTML.innerHTML = "Game over: You won";
@@ -334,6 +338,13 @@ function startPlacingShips() {
 	shipGrid.movable('.grid-stack-item', true);
 	// Agrego botón para que finalize la ubicación
 	finishPlacingButtonHTML.innerHTML = '<button onclick="finishPlacingShips()" class="finish-placing-button">Place the ships <i class="fa fa-ship" aria-hidden="true"></i></button>';
+	// Agrego un icono de rotación para celulares
+	if (screen.width < 500) {
+		let shipsArrayHTML = Array.from(document.getElementsByClassName("grid-stack-item-content ui-draggable-handle"));
+		shipsArrayHTML.forEach(shipHTML => {
+			shipHTML.innerHTML = '<span><i class="fa fa-repeat" aria-hidden="true"></i></span>';
+		});
+	}
 }
 
 /*********************************************************
